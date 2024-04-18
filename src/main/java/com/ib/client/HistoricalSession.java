@@ -5,9 +5,9 @@ package com.ib.client;
 
 public class HistoricalSession {
 
-  private String m_startDateTime;
-  private String m_endDateTime;
-  private String m_refDate;
+  private final String m_startDateTime;
+  private final String m_endDateTime;
+  private final String m_refDate;
 
   public HistoricalSession(String startDateTime, String endDateTime, String refDate) {
     m_startDateTime = startDateTime;

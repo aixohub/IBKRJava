@@ -8,6 +8,14 @@ public class FamilyCode {
   private String m_accountID;
   private String m_familyCodeStr;
 
+  public FamilyCode() {
+  }
+
+  public FamilyCode(String p_accountID, String p_familyCodeStr) {
+    m_accountID = p_accountID;
+    m_familyCodeStr = p_familyCodeStr;
+  }
+
   // Get
   public String accountID() {
     return m_accountID;
@@ -24,13 +32,5 @@ public class FamilyCode {
 
   public void familyCodeStr(String familyCodeStr) {
     m_familyCodeStr = familyCodeStr;
-  }
-
-  public FamilyCode() {
-  }
-
-  public FamilyCode(String p_accountID, String p_familyCodeStr) {
-    m_accountID = p_accountID;
-    m_familyCodeStr = p_familyCodeStr;
   }
 }

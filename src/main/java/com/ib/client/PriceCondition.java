@@ -10,14 +10,12 @@ import java.io.ObjectOutput;
 public class PriceCondition extends ContractCondition {
 
   public static final OrderConditionType conditionType = OrderConditionType.Price;
-
-  protected PriceCondition() {
-  }
-
+  private static final String[] mthdNames = new String[]{"default", "double bid/ask", "last",
+      "double last", "bid/ask", "", "", "last of bid/ask", "mid-point"};
   private double m_price;
   private int m_triggerMethod;
-  private static String[] mthdNames = new String[]{"default", "double bid/ask", "last",
-      "double last", "bid/ask", "", "", "last of bid/ask", "mid-point"};
+  protected PriceCondition() {
+  }
 
   @Override
   public String toString() {

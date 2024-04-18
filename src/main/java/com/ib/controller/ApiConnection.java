@@ -18,18 +18,11 @@ import java.nio.charset.StandardCharsets;
 
 public class ApiConnection extends EClientSocket {
 
-  public interface ILogger {
-
-    void log(String valueOf);
-  }
-
   public static final char EOL = 0;
   public static final char LOG_EOL = '_';
-
+  private static final EJavaSignal m_signal = new EJavaSignal();
   private final ILogger m_inLogger;
   private final ILogger m_outLogger;
-  private static final EJavaSignal m_signal = new EJavaSignal();
-
   public ApiConnection(EWrapper wrapper, ILogger inLogger, ILogger outLogger) {
     super(wrapper, m_signal);
     m_inLogger = inLogger;
@@ -44,7 +37,7 @@ public class ApiConnection extends EClientSocket {
     byte[] buf = msg.getRawData();
 
     if (m_outLogger != null) {
-      m_outLogger.log(new String(buf, 0, buf.length, StandardCharsets.UTF_8));
+      m_outLogger.log(new String(buf, StandardCharsets.UTF_8));
     }
   }
 
@@ -85,5 +78,10 @@ public class ApiConnection extends EClientSocket {
     }
 
     placeOrder(order.orderId(), contract, order);
+  }
+
+  public interface ILogger {
+
+    void log(String valueOf);
   }
 }

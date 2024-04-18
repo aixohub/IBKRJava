@@ -8,14 +8,6 @@ public class OrderComboLeg {
 
   private double m_price; // price per leg
 
-  public double price() {
-    return m_price;
-  }
-
-  public void price(double v) {
-    m_price = v;
-  }
-
   public OrderComboLeg() {
     m_price = Double.MAX_VALUE;
   }
@@ -24,16 +16,22 @@ public class OrderComboLeg {
     m_price = p_price;
   }
 
+  public double price() {
+    return m_price;
+  }
+
+  public void price(double v) {
+    m_price = v;
+  }
+
   @Override
   public boolean equals(Object p_other) {
     if (this == p_other) {
       return true;
     }
-    if (!(p_other instanceof OrderComboLeg)) {
+    if (!(p_other instanceof OrderComboLeg l_theOther)) {
       return false;
     }
-
-    OrderComboLeg l_theOther = (OrderComboLeg) p_other;
 
     return m_price == l_theOther.m_price;
   }

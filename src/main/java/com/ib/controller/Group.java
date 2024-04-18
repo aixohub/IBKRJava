@@ -12,7 +12,7 @@ public class Group {
 
   private String m_name;
   private Method m_defaultMethod;
-  private List<String> m_accounts = new ArrayList<>();
+  private final List<String> m_accounts = new ArrayList<>();
 
   public String name() {
     return m_name;

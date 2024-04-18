@@ -29,6 +29,33 @@ import java.util.Arrays;
 
 public class Types {
 
+  public static <T extends Enum<?> & IApiEnum> T getValueOf(String v, T[] values, T defaultValue) {
+    for (T currentEnum : values) {
+      if (currentEnum.getApiString().equals(v)) {
+        return currentEnum;
+      }
+    }
+    return defaultValue;
+  }
+
+  /**
+   * Lookup enum by ordinal. Use Enum.valueOf() to lookup by string.
+   */
+  public static <T extends Enum<T>> T getEnum(int ordinal, T[] values) {
+    if (ordinal == Integer.MAX_VALUE) {
+      return null;
+    }
+
+    for (T val : values) {
+      if (val.ordinal() == ordinal) {
+        return val;
+      }
+    }
+    String str = String.format("Error: %s is not a valid value for enum %s", ordinal,
+        values[0].getClass().getName());
+    throw new IllegalArgumentException(str);
+  }
+
   public enum TickByTickType {
     None, Last, AllLast, BidAsk, MidPoint,
   }
@@ -52,11 +79,7 @@ public class Types {
     AD(activeTimeStart, activeTimeEnd, componentSize, timeBetweenOrders, randomizeTime20,
         randomizeSize55, giveUp, catchUp, waitForFill);
 
-    private AlgoParam[] m_params;
-
-    public AlgoParam[] params() {
-      return Arrays.copyOf(m_params, m_params.length);
-    }
+    private final AlgoParam[] m_params;
 
     AlgoStrategy(AlgoParam... params) {
       m_params = Arrays.copyOf(params, params.length);
@@ -64,6 +87,10 @@ public class Types {
 
     public static AlgoStrategy get(String apiString) {
       return getValueOf(apiString, values(), None);
+    }
+
+    public AlgoParam[] params() {
+      return Arrays.copyOf(m_params, m_params.length);
     }
 
     @Override
@@ -137,10 +164,6 @@ public class Types {
 
     int m_val;
 
-    public int val() {
-      return m_val;
-    }
-
     TriggerMethod(int val) {
       m_val = val;
     }
@@ -152,6 +175,10 @@ public class Types {
         }
       }
       return null;
+    }
+
+    public int val() {
+      return m_val;
     }
 
     @Override
@@ -177,7 +204,7 @@ public class Types {
     None(""), Individual("I"), Agency("A"), AgentOtherMember("W"), IndividualPTIA("J"), AgencyPTIA(
         "U"), AgentOtherMemberPTIA("M"), IndividualPT("K"), AgencyPT("Y"), AgentOtherMemberPT("N");
 
-    private String m_apiString;
+    private final String m_apiString;
 
     Rule80A(String apiString) {
       m_apiString = apiString;
@@ -373,7 +400,7 @@ public class Types {
   public enum UsePriceMgmtAlgo {
     Default(null), NotUse(false), Use(true);
 
-    private Boolean value;
+    private final Boolean value;
 
     UsePriceMgmtAlgo(Boolean value) {
       this.value = value;
@@ -382,32 +409,5 @@ public class Types {
     public Boolean toBoolean() {
       return value;
     }
-  }
-
-  public static <T extends Enum<?> & IApiEnum> T getValueOf(String v, T[] values, T defaultValue) {
-    for (T currentEnum : values) {
-      if (currentEnum.getApiString().equals(v)) {
-        return currentEnum;
-      }
-    }
-    return defaultValue;
-  }
-
-  /**
-   * Lookup enum by ordinal. Use Enum.valueOf() to lookup by string.
-   */
-  public static <T extends Enum<T>> T getEnum(int ordinal, T[] values) {
-    if (ordinal == Integer.MAX_VALUE) {
-      return null;
-    }
-
-    for (T val : values) {
-      if (val.ordinal() == ordinal) {
-        return val;
-      }
-    }
-    String str = String.format("Error: %s is not a valid value for enum %s", ordinal,
-        values[0].getClass().getName());
-    throw new IllegalArgumentException(str);
   }
 }

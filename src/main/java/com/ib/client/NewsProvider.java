@@ -8,6 +8,14 @@ public class NewsProvider {
   private String m_providerCode;
   private String m_providerName;
 
+  public NewsProvider() {
+  }
+
+  public NewsProvider(String p_providerCode, String p_providerName) {
+    m_providerCode = p_providerCode;
+    m_providerName = p_providerName;
+  }
+
   // Get
   public String providerCode() {
     return m_providerCode;
@@ -24,13 +32,5 @@ public class NewsProvider {
 
   public void providerName(String providerName) {
     m_providerName = providerName;
-  }
-
-  public NewsProvider() {
-  }
-
-  public NewsProvider(String p_providerCode, String p_providerName) {
-    m_providerCode = p_providerCode;
-    m_providerName = p_providerName;
   }
 }

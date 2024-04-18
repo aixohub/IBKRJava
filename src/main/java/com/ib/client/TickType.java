@@ -111,17 +111,8 @@ public enum TickType {
 
   UNKNOWN(Integer.MAX_VALUE, "unknown");
 
-  private int m_ndx;
-  private String m_field;
-
-  // Get
-  public int index() {
-    return m_ndx;
-  }
-
-  public String field() {
-    return m_field;
-  }
+  private final int m_ndx;
+  private final String m_field;
 
   TickType(int ndx, String field) {
     m_ndx = ndx;
@@ -148,5 +139,14 @@ public enum TickType {
       }
     }
     return UNKNOWN.m_ndx;
+  }
+
+  // Get
+  public int index() {
+    return m_ndx;
+  }
+
+  public String field() {
+    return m_field;
   }
 }

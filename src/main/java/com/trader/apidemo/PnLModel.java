@@ -11,78 +11,79 @@ import javax.swing.table.AbstractTableModel;
 
 public class PnLModel extends AbstractTableModel {
 
-    private class PnLItem {
-        
-        public PnLItem(double dailyPnL, double unrealizedPnL, double realizedPnL) {
-            m_dailyPnL = dailyPnL;
-            m_unrealizedPnL = unrealizedPnL;
-            m_realizedPnL = realizedPnL;
-        }
-        
-        public double dailyPnL() {
-            return m_dailyPnL;
-        }
+  private static final Dictionary<Integer, String> columnNames = new Hashtable<>();
 
-        public double unrealizedPnL() {
-            return m_unrealizedPnL;
-        }        
-        
-        public double realizedPnL() {
-            return m_realizedPnL;
-        }
+  static {
+    columnNames.put(0, "Daily Pnl");
+    columnNames.put(1, "Unrealized PnL");
+    columnNames.put(2, "Realized PnL");
+  }
 
-        private double m_dailyPnL;
-        private double m_unrealizedPnL;
-        private double m_realizedPnL;
-        
-    }
-    
-    private List<PnLItem> m_rows = new ArrayList<>();
-    private static Dictionary<Integer, String> columnNames = new Hashtable<>();
-    
-    static {
-        columnNames.put(0, "Daily Pnl");
-        columnNames.put(1, "Unrealized PnL");
-        columnNames.put(2, "Realized PnL");       
-    }
-    
-    @Override
-    public String getColumnName(int column) {
-        return columnNames.get(column);
-    }
-    
-    @Override
-    public int getRowCount() {
-        return m_rows.size();
+  private final List<PnLItem> m_rows = new ArrayList<>();
+
+  @Override
+  public String getColumnName(int column) {
+    return columnNames.get(column);
+  }
+
+  @Override
+  public int getRowCount() {
+    return m_rows.size();
+  }
+
+  @Override
+  public int getColumnCount() {
+    return 3;
+  }
+
+  @Override
+  public Object getValueAt(int rowIndex, int columnIndex) {
+    PnLItem item = m_rows.get(rowIndex);
+
+    switch (columnIndex) {
+      case 0:
+        return item.dailyPnL();
+
+      case 1:
+        return item.unrealizedPnL();
+
+      case 2:
+        return item.realizedPnL();
     }
 
-    @Override
-    public int getColumnCount() {
-        return 3;
+    return null;
+  }
+
+  public void addRow(double dailyPnL, double unrealizedPnL, double realizedPnL) {
+    m_rows.add(new PnLItem(dailyPnL, unrealizedPnL, realizedPnL));
+
+    fireTableDataChanged();
+  }
+
+  private class PnLItem {
+
+    private final double m_dailyPnL;
+    private final double m_unrealizedPnL;
+    private final double m_realizedPnL;
+
+    public PnLItem(double dailyPnL, double unrealizedPnL, double realizedPnL) {
+      m_dailyPnL = dailyPnL;
+      m_unrealizedPnL = unrealizedPnL;
+      m_realizedPnL = realizedPnL;
     }
 
-    @Override
-    public Object getValueAt(int rowIndex, int columnIndex) {
-        PnLItem item = m_rows.get(rowIndex);
-        
-        switch (columnIndex) {
-        case 0:
-            return item.dailyPnL();
-            
-        case 1:
-            return item.unrealizedPnL();
-            
-        case 2:
-            return item.realizedPnL();
-        }
-        
-        return null;
+    public double dailyPnL() {
+      return m_dailyPnL;
     }
 
-    public void addRow(double dailyPnL, double unrealizedPnL, double realizedPnL) {
-        m_rows.add(new PnLItem(dailyPnL, unrealizedPnL, realizedPnL));
-        
-        fireTableDataChanged();
+    public double unrealizedPnL() {
+      return m_unrealizedPnL;
     }
+
+    public double realizedPnL() {
+      return m_realizedPnL;
+    }
+
+  }
 
 }

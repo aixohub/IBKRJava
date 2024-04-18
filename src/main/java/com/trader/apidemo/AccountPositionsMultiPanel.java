@@ -45,9 +45,9 @@ class AccountPositionsMultiPanel extends JPanel {
 
   private static class RequestPanel extends JPanel {
 
+    final JCheckBox m_ledgerAndNLV = new JCheckBox();
     protected JTextField m_account = new JTextField();
     protected JTextField m_modelCode = new JTextField();
-    final JCheckBox m_ledgerAndNLV = new JCheckBox();
 
     RequestPanel() {
       VerticalPanel p = new VerticalPanel();
@@ -67,6 +67,68 @@ class AccountPositionsMultiPanel extends JPanel {
     @Override
     public Dimension getMaximumSize() {
       return super.getPreferredSize();
+    }
+  }
+
+  private static class AccountUpdateRow {
+
+    String m_account;
+    String m_modelCode;
+    String m_key;
+    String m_value;
+    String m_currency;
+
+    void update(String account, String modelCode, String key, String value, String currency) {
+      m_account = account;
+      m_modelCode = modelCode;
+      m_key = key;
+      m_value = value;
+      m_currency = currency;
+    }
+  }
+
+  private static class AccountUpdateKey {
+
+    String m_key;
+    String m_currency;
+
+    AccountUpdateKey(String key, String currency) {
+      m_key = key;
+      m_currency = currency == null ? "" : currency;
+    }
+
+    @Override
+    public int hashCode() {
+      return m_key.hashCode() + m_currency.hashCode();
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+      if (this == obj) {
+        return true;
+      }
+      if (!(obj instanceof AccountUpdateKey other)) {
+        return false;
+      }
+      return m_key.equals(other.m_key) && m_currency.equals(other.m_currency);
+    }
+  }
+
+  private static class PositionRow {
+
+    String m_account;
+    String m_modelCode;
+    Contract m_contract;
+    Decimal m_position;
+    double m_avgCost;
+
+    void update(String account, String modelCode, Contract contract, Decimal position,
+        double avgCost) {
+      m_account = account;
+      m_modelCode = modelCode;
+      m_contract = contract;
+      m_position = position;
+      m_avgCost = avgCost;
     }
   }
 
@@ -367,69 +429,6 @@ class AccountPositionsMultiPanel extends JPanel {
         }
 
       }
-    }
-  }
-
-  private static class AccountUpdateRow {
-
-    String m_account;
-    String m_modelCode;
-    String m_key;
-    String m_value;
-    String m_currency;
-
-    void update(String account, String modelCode, String key, String value, String currency) {
-      m_account = account;
-      m_modelCode = modelCode;
-      m_key = key;
-      m_value = value;
-      m_currency = currency;
-    }
-  }
-
-  private static class AccountUpdateKey {
-
-    String m_key;
-    String m_currency;
-
-    AccountUpdateKey(String key, String currency) {
-      m_key = key;
-      m_currency = currency == null ? "" : currency;
-    }
-
-    @Override
-    public int hashCode() {
-      return m_key.hashCode() + m_currency.hashCode();
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-      if (this == obj) {
-        return true;
-      }
-      if (!(obj instanceof AccountUpdateKey)) {
-        return false;
-      }
-      AccountUpdateKey other = (AccountUpdateKey) obj;
-      return m_key.equals(other.m_key) && m_currency.equals(other.m_currency);
-    }
-  }
-
-  private static class PositionRow {
-
-    String m_account;
-    String m_modelCode;
-    Contract m_contract;
-    Decimal m_position;
-    double m_avgCost;
-
-    void update(String account, String modelCode, Contract contract, Decimal position,
-        double avgCost) {
-      m_account = account;
-      m_modelCode = modelCode;
-      m_contract = contract;
-      m_position = position;
-      m_avgCost = avgCost;
     }
   }
 }

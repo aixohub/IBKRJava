@@ -17,28 +17,28 @@ public enum OrderConditionType {
     m_val = v;
   }
 
-  public int val() {
-    return m_val;
-  }
-
   public static OrderConditionType fromInt(int n) {
-		for (OrderConditionType i : OrderConditionType.values()) {
-			if (i.val() == n) {
-				return i;
-			}
-		}
+    for (OrderConditionType i : OrderConditionType.values()) {
+      if (i.val() == n) {
+        return i;
+      }
+    }
 
     throw new IllegalArgumentException(
         "Error: " + n + " is not a valid value for enum OrderConditionType");
   }
 
   public static OrderConditionType fromString(String s) {
-		for (OrderConditionType i : OrderConditionType.values()) {
-			if (i.name().equalsIgnoreCase(s)) {
-				return i;
-			}
-		}
+    for (OrderConditionType i : OrderConditionType.values()) {
+      if (i.name().equalsIgnoreCase(s)) {
+        return i;
+      }
+    }
 
     throw new RuntimeException("Invalid order condition type: " + s);
+  }
+
+  public int val() {
+    return m_val;
   }
 }

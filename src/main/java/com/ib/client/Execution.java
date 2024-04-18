@@ -9,7 +9,7 @@ enum Liquidities {
   Removed("Removed Liquidity"),
   RoudedOut("Liquidity Routed Out");
 
-  private String m_text;
+  private final String m_text;
 
   Liquidities(String text) {
     m_text = text;
@@ -17,11 +17,6 @@ enum Liquidities {
 
   Liquidities() {
     m_text = "None";
-  }
-
-  @Override
-  public String toString() {
-    return m_text;
   }
 
   public static Liquidities fromInt(int n) {
@@ -34,6 +29,11 @@ enum Liquidities {
 
   public static int toInt(Liquidities l) {
     return l.ordinal();
+  }
+
+  @Override
+  public String toString() {
+    return m_text;
   }
 }
 
@@ -57,6 +57,43 @@ public class Execution {
   private double m_evMultiplier;
   private String m_modelCode;
   private Liquidities m_lastLiquidity;
+
+  public Execution() {
+    m_orderId = 0;
+    m_clientId = 0;
+    m_shares = Decimal.ZERO;
+    m_price = 0;
+    m_permId = 0;
+    m_liquidation = 0;
+    m_cumQty = Decimal.ZERO;
+    m_avgPrice = 0;
+    m_evMultiplier = 0;
+    m_lastLiquidity = Liquidities.None;
+  }
+
+  public Execution(int p_orderId, int p_clientId, String p_execId, String p_time,
+      String p_acctNumber, String p_exchange, String p_side, Decimal p_shares,
+      double p_price, int p_permId, int p_liquidation, Decimal p_cumQty,
+      double p_avgPrice, String p_orderRef, String p_evRule, double p_evMultiplier,
+      String p_modelCode) {
+    m_orderId = p_orderId;
+    m_clientId = p_clientId;
+    m_execId = p_execId;
+    m_time = p_time;
+    m_acctNumber = p_acctNumber;
+    m_exchange = p_exchange;
+    m_side = p_side;
+    m_shares = p_shares;
+    m_price = p_price;
+    m_permId = p_permId;
+    m_liquidation = p_liquidation;
+    m_cumQty = p_cumQty;
+    m_avgPrice = p_avgPrice;
+    m_orderRef = p_orderRef;
+    m_evRule = p_evRule;
+    m_evMultiplier = p_evMultiplier;
+    m_modelCode = p_modelCode;
+  }
 
   // Get
   public int orderId() {
@@ -208,52 +245,14 @@ public class Execution {
     m_lastLiquidity = Liquidities.fromInt(v);
   }
 
-  public Execution() {
-    m_orderId = 0;
-    m_clientId = 0;
-    m_shares = Decimal.ZERO;
-    m_price = 0;
-    m_permId = 0;
-    m_liquidation = 0;
-    m_cumQty = Decimal.ZERO;
-    m_avgPrice = 0;
-    m_evMultiplier = 0;
-    m_lastLiquidity = Liquidities.None;
-  }
-
-  public Execution(int p_orderId, int p_clientId, String p_execId, String p_time,
-      String p_acctNumber, String p_exchange, String p_side, Decimal p_shares,
-      double p_price, int p_permId, int p_liquidation, Decimal p_cumQty,
-      double p_avgPrice, String p_orderRef, String p_evRule, double p_evMultiplier,
-      String p_modelCode) {
-    m_orderId = p_orderId;
-    m_clientId = p_clientId;
-    m_execId = p_execId;
-    m_time = p_time;
-    m_acctNumber = p_acctNumber;
-    m_exchange = p_exchange;
-    m_side = p_side;
-    m_shares = p_shares;
-    m_price = p_price;
-    m_permId = p_permId;
-    m_liquidation = p_liquidation;
-    m_cumQty = p_cumQty;
-    m_avgPrice = p_avgPrice;
-    m_orderRef = p_orderRef;
-    m_evRule = p_evRule;
-    m_evMultiplier = p_evMultiplier;
-    m_modelCode = p_modelCode;
-  }
-
   @Override
   public boolean equals(Object p_other) {
     if (this == p_other) {
       return true;
     }
-    if (!(p_other instanceof Execution)) {
+    if (!(p_other instanceof Execution l_theOther)) {
       return false;
     }
-    Execution l_theOther = (Execution) p_other;
     return m_execId.equals(l_theOther.m_execId);
   }
 

@@ -5,7 +5,6 @@ package com.trader.TestJavaClient;
 
 import java.awt.BorderLayout;
 import java.awt.GridLayout;
-
 import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
@@ -14,55 +13,57 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 
 class MarketRuleDlg extends JDialog {
-    private JTextField		m_marketRuleId = new JTextField("0");
-    private boolean 		m_rc;
-    
-    int m_retMarketRuleId;
 
-    boolean rc()            { return m_rc; }
+  int m_retMarketRuleId;
+  private final JTextField m_marketRuleId = new JTextField("0");
+  private boolean m_rc;
 
-    MarketRuleDlg(JFrame parent) {
-        super(parent, true);
+  MarketRuleDlg(JFrame parent) {
+    super(parent, true);
 
-        // create button panel
-        JPanel buttonPanel = new JPanel();
-        JButton btnOk = new JButton("OK");
-        buttonPanel.add(btnOk);
-        JButton btnCancel = new JButton("Cancel");
-        buttonPanel.add(btnCancel);
+    // create button panel
+    JPanel buttonPanel = new JPanel();
+    JButton btnOk = new JButton("OK");
+    buttonPanel.add(btnOk);
+    JButton btnCancel = new JButton("Cancel");
+    buttonPanel.add(btnCancel);
 
-        // create action listeners
-        btnOk.addActionListener(e -> onOk());
-        btnCancel.addActionListener(e -> onCancel());
-        
-        // create mid summary panel
-        JPanel midPanel = new JPanel( new GridLayout( 0, 1, 5, 5) );
-        midPanel.add( new JLabel( "Market Rule Id") );
-        midPanel.add( m_marketRuleId);
+    // create action listeners
+    btnOk.addActionListener(e -> onOk());
+    btnCancel.addActionListener(e -> onCancel());
 
-        // create dlg box
-        getContentPane().add( midPanel, BorderLayout.CENTER);
-        getContentPane().add( buttonPanel, BorderLayout.SOUTH);
-        setTitle( "Market Rule Request");
-        pack();    }
+    // create mid summary panel
+    JPanel midPanel = new JPanel(new GridLayout(0, 1, 5, 5));
+    midPanel.add(new JLabel("Market Rule Id"));
+    midPanel.add(m_marketRuleId);
 
-    void onOk() {
-        m_rc = false;
+    // create dlg box
+    getContentPane().add(midPanel, BorderLayout.CENTER);
+    getContentPane().add(buttonPanel, BorderLayout.SOUTH);
+    setTitle("Market Rule Request");
+    pack();
+  }
 
-        try {
-            m_retMarketRuleId = Integer.parseInt( m_marketRuleId.getText());
-        }
-        catch( Exception e) {
-            Main.inform( this, "Error - " + e);
-            return;
-        }
+  boolean rc() {
+    return m_rc;
+  }
 
-        m_rc = true;
-        setVisible( false);
+  void onOk() {
+    m_rc = false;
+
+    try {
+      m_retMarketRuleId = Integer.parseInt(m_marketRuleId.getText());
+    } catch (Exception e) {
+      Main.inform(this, "Error - " + e);
+      return;
     }
 
-    void onCancel() {
-        m_rc = false;
-        setVisible( false);
-    }
+    m_rc = true;
+    setVisible(false);
+  }
+
+  void onCancel() {
+    m_rc = false;
+    setVisible(false);
+  }
 }

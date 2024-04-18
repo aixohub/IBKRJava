@@ -5,12 +5,12 @@ package com.ib.client;
 
 public class HistoricalTickLast {
 
-  private long m_time;
-  private TickAttribLast m_tickAttribLast;
-  private double m_price;
-  private Decimal m_size;
-  private String m_exchange;
-  private String m_specialConditions;
+  private final long m_time;
+  private final TickAttribLast m_tickAttribLast;
+  private final double m_price;
+  private final Decimal m_size;
+  private final String m_exchange;
+  private final String m_specialConditions;
 
   public HistoricalTickLast(long time, TickAttribLast tickAttribLast, double price, Decimal size,
       String exchange, String specialConditions) {

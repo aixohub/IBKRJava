@@ -6,6 +6,7 @@ package com.ib.client;
 public class PercentChangeCondition extends ContractCondition {
 
   public static final OrderConditionType conditionType = OrderConditionType.PercentChange;
+  private double m_changePercent = Double.MAX_VALUE;
 
   protected PercentChangeCondition() {
   }
@@ -19,8 +20,6 @@ public class PercentChangeCondition extends ContractCondition {
   public String toString() {
     return toString(null);
   }
-
-  private double m_changePercent = Double.MAX_VALUE;
 
   public double changePercent() {
     return m_changePercent;

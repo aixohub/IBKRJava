@@ -3,9 +3,6 @@
 
 package com.ib.client;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import com.ib.client.Types.Action;
 import com.ib.client.Types.AlgoStrategy;
 import com.ib.client.Types.HedgeType;
@@ -16,6 +13,8 @@ import com.ib.client.Types.Rule80A;
 import com.ib.client.Types.TimeInForce;
 import com.ib.client.Types.TriggerMethod;
 import com.ib.client.Types.VolatilityType;
+import java.util.ArrayList;
+import java.util.List;
 
 public class Order {
 
@@ -226,6 +225,62 @@ public class Order {
   private double m_competeAgainstBestOffset;
   private double m_midOffsetAtWhole;
   private double m_midOffsetAtHalf;
+
+  public Order() {
+    m_openClose = EMPTY_STR;
+    m_activeStartTime = EMPTY_STR;
+    m_activeStopTime = EMPTY_STR;
+    m_outsideRth = false;
+    m_origin = CUSTOMER;
+    m_designatedLocation = EMPTY_STR;
+    m_optOutSmartRouting = false;
+    m_startingPrice = Double.MAX_VALUE;
+    m_stockRefPrice = Double.MAX_VALUE;
+    m_stockRangeLower = Double.MAX_VALUE;
+    m_stockRangeUpper = Double.MAX_VALUE;
+    m_deltaNeutralConId = 0;
+    m_deltaNeutralSettlingFirm = EMPTY_STR;
+    m_deltaNeutralClearingAccount = EMPTY_STR;
+    m_deltaNeutralClearingIntent = EMPTY_STR;
+    m_deltaNeutralOpenClose = EMPTY_STR;
+    m_deltaNeutralShortSale = false;
+    m_deltaNeutralShortSaleSlot = 0;
+    m_deltaNeutralDesignatedLocation = EMPTY_STR;
+    m_basisPoints = Double.MAX_VALUE;
+    m_basisPointsType = Integer.MAX_VALUE;
+    m_scaleAutoReset = false;
+    m_scaleRandomPercent = false;
+    m_scaleTable = EMPTY_STR;
+    m_whatIf = false;
+    m_notHeld = false;
+    m_algoId = EMPTY_STR;
+    m_solicited = false;
+    m_randomizeSize = false;
+    m_randomizePrice = false;
+    m_extOperator = EMPTY_STR;
+    m_softDollarTier = new SoftDollarTier(EMPTY_STR, EMPTY_STR, EMPTY_STR);
+    m_dontUseAutoPriceForHedge = false;
+    m_isOmsContainer = false;
+    m_discretionaryUpToLimitPrice = false;
+    m_autoCancelDate = EMPTY_STR;
+    m_filledQuantity = Decimal.INVALID;
+    m_refFuturesConId = 0;
+    m_autoCancelParent = false;
+    m_shareholder = EMPTY_STR;
+    m_imbalanceOnly = false;
+    m_routeMarketableToBbo = false;
+    m_parentPermId = 0;
+    m_usePriceMgmtAlgo = null;
+    m_duration = Integer.MAX_VALUE;
+    m_postToAts = Integer.MAX_VALUE;
+    m_advancedErrorOverride = EMPTY_STR;
+    m_manualOrderTime = EMPTY_STR;
+    m_minTradeQty = Integer.MAX_VALUE;
+    m_minCompeteSize = Integer.MAX_VALUE;
+    m_competeAgainstBestOffset = Double.MAX_VALUE;
+    m_midOffsetAtWhole = Double.MAX_VALUE;
+    m_midOffsetAtHalf = Double.MAX_VALUE;
+  }
 
   // getters
   public Action action() {
@@ -1417,63 +1472,6 @@ public class Order {
     m_midOffsetAtHalf = v;
   }
 
-
-  public Order() {
-    m_openClose = EMPTY_STR;
-    m_activeStartTime = EMPTY_STR;
-    m_activeStopTime = EMPTY_STR;
-    m_outsideRth = false;
-    m_origin = CUSTOMER;
-    m_designatedLocation = EMPTY_STR;
-    m_optOutSmartRouting = false;
-    m_startingPrice = Double.MAX_VALUE;
-    m_stockRefPrice = Double.MAX_VALUE;
-    m_stockRangeLower = Double.MAX_VALUE;
-    m_stockRangeUpper = Double.MAX_VALUE;
-    m_deltaNeutralConId = 0;
-    m_deltaNeutralSettlingFirm = EMPTY_STR;
-    m_deltaNeutralClearingAccount = EMPTY_STR;
-    m_deltaNeutralClearingIntent = EMPTY_STR;
-    m_deltaNeutralOpenClose = EMPTY_STR;
-    m_deltaNeutralShortSale = false;
-    m_deltaNeutralShortSaleSlot = 0;
-    m_deltaNeutralDesignatedLocation = EMPTY_STR;
-    m_basisPoints = Double.MAX_VALUE;
-    m_basisPointsType = Integer.MAX_VALUE;
-    m_scaleAutoReset = false;
-    m_scaleRandomPercent = false;
-    m_scaleTable = EMPTY_STR;
-    m_whatIf = false;
-    m_notHeld = false;
-    m_algoId = EMPTY_STR;
-    m_solicited = false;
-    m_randomizeSize = false;
-    m_randomizePrice = false;
-    m_extOperator = EMPTY_STR;
-    m_softDollarTier = new SoftDollarTier(EMPTY_STR, EMPTY_STR, EMPTY_STR);
-    m_dontUseAutoPriceForHedge = false;
-    m_isOmsContainer = false;
-    m_discretionaryUpToLimitPrice = false;
-    m_autoCancelDate = EMPTY_STR;
-    m_filledQuantity = Decimal.INVALID;
-    m_refFuturesConId = 0;
-    m_autoCancelParent = false;
-    m_shareholder = EMPTY_STR;
-    m_imbalanceOnly = false;
-    m_routeMarketableToBbo = false;
-    m_parentPermId = 0;
-    m_usePriceMgmtAlgo = null;
-    m_duration = Integer.MAX_VALUE;
-    m_postToAts = Integer.MAX_VALUE;
-    m_advancedErrorOverride = EMPTY_STR;
-    m_manualOrderTime = EMPTY_STR;
-    m_minTradeQty = Integer.MAX_VALUE;
-    m_minCompeteSize = Integer.MAX_VALUE;
-    m_competeAgainstBestOffset = Double.MAX_VALUE;
-    m_midOffsetAtWhole = Double.MAX_VALUE;
-    m_midOffsetAtHalf = Double.MAX_VALUE;
-  }
-
   public List<TagValue> algoParams() {
     if (m_algoParams == null) {
       m_algoParams = new ArrayList<>();
@@ -1486,10 +1484,9 @@ public class Order {
     if (this == p_other) {
       return true;
     }
-    if (!(p_other instanceof Order)) {
+    if (!(p_other instanceof Order l_theOther)) {
       return false;
     }
-    Order l_theOther = (Order) p_other;
 
     if (m_permId == l_theOther.m_permId) {
       return true;
@@ -1649,17 +1646,13 @@ public class Order {
       return false;
     }
 
-    if (!Util.listsEqualUnordered(m_conditions, l_theOther.m_conditions)) {
-      return false;
-    }
-
-    return true;
+    return Util.listsEqualUnordered(m_conditions, l_theOther.m_conditions);
   }
 
   @Override
   public int hashCode() {
     // Use m_permId only due to the definition of equals.
-    return (int) (m_permId ^ (m_permId >>> 32));
+    return m_permId ^ (m_permId >>> 32);
   }
 
 }

@@ -21,10 +21,9 @@ public final class TagValue {
     if (this == p_other) {
       return true;
     }
-    if (!(p_other instanceof TagValue)) {
+    if (!(p_other instanceof TagValue l_theOther)) {
       return false;
     }
-    TagValue l_theOther = (TagValue) p_other;
 
     return Util.StringCompare(m_tag, l_theOther.m_tag) == 0
         && Util.StringCompare(m_value, l_theOther.m_value) == 0;

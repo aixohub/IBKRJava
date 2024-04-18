@@ -27,6 +27,30 @@ class Builder implements ObjectOutput {
     m_sb = new ByteBuffer(size);
   }
 
+  // b[] must be at least b[position+4]
+  static void intToBytes(int val, byte[] b, int position) {
+    b[position] = (byte) (0xff & (val >> 24));
+    b[position + 1] = (byte) (0xff & (val >> 16));
+    b[position + 2] = (byte) (0xff & (val >> 8));
+    b[position + 3] = (byte) (0xff & val);
+  }
+
+  private static boolean isAsciiPrintable(String str) {
+    if (str == null) {
+      return false;
+    }
+    for (int i = 0; i < str.length(); i++) {
+      if (!isAsciiPrintable(str.charAt(i))) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  private static boolean isAsciiPrintable(char ch) {
+    return ch >= 32 && ch < 127;
+  }
+
   public void send(int a) throws EClientException {
     send(String.valueOf(a));
   }
@@ -108,59 +132,6 @@ class Builder implements ObjectOutput {
     m_sb.writeTo(dos);
   }
 
-  // b[] must be at least b[position+4]
-  static void intToBytes(int val, byte b[], int position) {
-    b[position] = (byte) (0xff & (val >> 24));
-    b[position + 1] = (byte) (0xff & (val >> 16));
-    b[position + 2] = (byte) (0xff & (val >> 8));
-    b[position + 3] = (byte) (0xff & val);
-  }
-
-  private static boolean isAsciiPrintable(String str) {
-    if (str == null) {
-      return false;
-    }
-    for (int i = 0; i < str.length(); i++) {
-      if (isAsciiPrintable(str.charAt(i)) == false) {
-        return false;
-      }
-    }
-    return true;
-  }
-
-  private static boolean isAsciiPrintable(char ch) {
-    return ch >= 32 && ch < 127;
-  }
-
-  /**
-   * inner class: ByteBuffer - storage for bytes and direct access to buffer.
-   */
-  private static class ByteBuffer extends ByteArrayOutputStream {
-
-    private final int paddingSize; // 1 disables padding, 4 is normal if padding is used
-
-    ByteBuffer(int capacity) {
-      super(capacity);
-      paddingSize = 1;
-    }
-
-    void updateLength(int lengthHeaderPosition) {
-      int len = this.count - EMPTY_LENGTH_HEADER.length - lengthHeaderPosition;
-      if (paddingSize > 1) {
-        int padding = paddingSize - len % paddingSize;
-        if (padding < paddingSize) {
-          this.write(EMPTY_LENGTH_HEADER, 0, paddingSize); // extra padding at the end
-          len = this.count - EMPTY_LENGTH_HEADER.length - lengthHeaderPosition;
-        }
-      }
-      intToBytes(len, this.buf, lengthHeaderPosition);
-    }
-
-    void writeTo(DataOutputStream out) throws IOException {
-      out.write(this.buf, 0, this.count);
-    }
-  }
-
   @Override
   public void writeBoolean(boolean arg0) throws IOException {
     send(arg0);
@@ -240,5 +211,34 @@ class Builder implements ObjectOutput {
 
   @Override
   public void writeObject(Object arg0) throws IOException {
+  }
+
+  /**
+   * inner class: ByteBuffer - storage for bytes and direct access to buffer.
+   */
+  private static class ByteBuffer extends ByteArrayOutputStream {
+
+    private final int paddingSize; // 1 disables padding, 4 is normal if padding is used
+
+    ByteBuffer(int capacity) {
+      super(capacity);
+      paddingSize = 1;
+    }
+
+    void updateLength(int lengthHeaderPosition) {
+      int len = this.count - EMPTY_LENGTH_HEADER.length - lengthHeaderPosition;
+      if (paddingSize > 1) {
+        int padding = paddingSize - len % paddingSize;
+        if (padding < paddingSize) {
+          this.write(EMPTY_LENGTH_HEADER, 0, paddingSize); // extra padding at the end
+          len = this.count - EMPTY_LENGTH_HEADER.length - lengthHeaderPosition;
+        }
+      }
+      intToBytes(len, this.buf, lengthHeaderPosition);
+    }
+
+    void writeTo(DataOutputStream out) throws IOException {
+      out.write(this.buf, 0, this.count);
+    }
   }
 }

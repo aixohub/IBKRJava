@@ -59,20 +59,11 @@ import java.util.StringTokenizer;
 
 public class ApiController implements EWrapper {
 
-  private ApiConnection m_client;
+  private static final int REPLACE_FA_GROUPS_REQ_ID = 0;
+  private static final int REPLACE_FA_PROFILES_REQ_ID = 1;
   private final ILogger m_outLogger;
   private final ILogger m_inLogger;
-  private int m_reqId;  // used for all requests except orders; designed not to conflict with m_orderId
-  private int m_orderId;
-
   private final IConnectionHandler m_connectionHandler;
-  private ITradeReportHandler m_tradeReportHandler;
-  private ICompletedOrdersHandler m_completedOrdersHandler;
-  private IAdvisorHandler m_advisorHandler;
-  private IScannerHandler m_scannerHandler;
-  private ITimeHandler m_timeHandler;
-  private IBulletinHandler m_bulletinHandler;
-  private IUserInfoHandler m_userInfoHandler;
   private final Map<Integer, IInternalHandler> m_contractDetailsMap = new HashMap<>();
   private final Map<Integer, IOptHandler> m_optionCompMap = new HashMap<>();
   private final Map<Integer, IEfpHandler> m_efpMap = new HashMap<>();
@@ -111,27 +102,17 @@ public class ApiController implements EWrapper {
   private final Map<Integer, IWshMetaDataHandler> m_wshMetaDataMap = new HashMap<>();
   private final Map<Integer, IWshEventDataHandler> m_wshEventDataMap = new HashMap<>();
   private final Map<Integer, IHistoricalScheduleHandler> m_historicalScheduleMap = new HashMap<>();
+  private final ApiConnection m_client;
+  private int m_reqId;  // used for all requests except orders; designed not to conflict with m_orderId
+  private int m_orderId;
+  private ITradeReportHandler m_tradeReportHandler;
+  private ICompletedOrdersHandler m_completedOrdersHandler;
+  private IAdvisorHandler m_advisorHandler;
+  private IScannerHandler m_scannerHandler;
+  private ITimeHandler m_timeHandler;
+  private IBulletinHandler m_bulletinHandler;
+  private IUserInfoHandler m_userInfoHandler;
   private boolean m_connected = false;
-
-  public ApiConnection client() {
-    return m_client;
-  }
-
-  // ---------------------------------------- Constructor and Connection handling ----------------------------------------
-  public interface IConnectionHandler {
-
-    void connected();
-
-    void disconnected();
-
-    void accountList(List<String> list);
-
-    void error(Exception e);
-
-    void message(int id, int errorCode, String errorMsg, String advancedOrderRejectJson);
-
-    void show(String string);
-  }
 
   public ApiController(IConnectionHandler handler) {
     this(handler, null, null);
@@ -142,6 +123,20 @@ public class ApiController implements EWrapper {
     m_client = new ApiConnection(this, inLogger, outLogger);
     m_inLogger = inLogger;
     m_outLogger = outLogger;
+  }
+
+  private static <K, V> K getAndRemoveKey(Map<K, V> map, V value) {
+    for (Entry<K, V> entry : map.entrySet()) {
+      if (entry.getValue() == value) {
+        map.remove(entry.getKey());
+        return entry.getKey();
+      }
+    }
+    return null;
+  }
+
+  public ApiConnection client() {
+    return m_client;
   }
 
   private void startMsgProcessingThread() {
@@ -241,19 +236,6 @@ public class ApiController implements EWrapper {
     m_connected = false;
   }
 
-
-  // ---------------------------------------- Account and portfolio updates ----------------------------------------
-  public interface IAccountHandler {
-
-    void accountValue(String account, String key, String value, String currency);
-
-    void accountTime(String timeStamp);
-
-    void accountDownloadEnd(String account);
-
-    void updatePortfolio(Position position);
-  }
-
   public void reqAccountUpdates(boolean subscribe, String acctCode, IAccountHandler handler) {
     if (!checkConnection()) {
       return;
@@ -304,21 +286,6 @@ public class ApiController implements EWrapper {
       handler.updatePortfolio(position);
     }
     recEOM();
-  }
-
-  // ---------------------------------------- Account Summary handling ----------------------------------------
-  public interface IAccountSummaryHandler {
-
-    void accountSummary(String account, AccountSummaryTag tag, String value, String currency);
-
-    void accountSummaryEnd();
-  }
-
-  public interface IMarketValueSummaryHandler {
-
-    void marketValueSummary(String account, MarketValueTag tag, String value, String currency);
-
-    void marketValueSummaryEnd();
   }
 
   /**
@@ -417,14 +384,6 @@ public class ApiController implements EWrapper {
     recEOM();
   }
 
-  // ---------------------------------------- Position handling ----------------------------------------
-  public interface IPositionHandler {
-
-    void position(String account, Contract contract, Decimal pos, double avgCost);
-
-    void positionEnd();
-  }
-
   public void reqPositions(IPositionHandler handler) {
     if (!checkConnection()) {
       return;
@@ -461,12 +420,6 @@ public class ApiController implements EWrapper {
     recEOM();
   }
 
-  // ---------------------------------------- Contract Details ----------------------------------------
-  public interface IContractDetailsHandler {
-
-    void contractDetails(List<ContractDetails> list);
-  }
-
   public void reqContractDetails(Contract contract, final IContractDetailsHandler processor) {
     if (!checkConnection()) {
       return;
@@ -485,13 +438,6 @@ public class ApiController implements EWrapper {
       }
     });
     sendEOM();
-  }
-
-  private interface IInternalHandler {
-
-    void contractDetails(ContractDetails data);
-
-    void contractDetailsEnd();
   }
 
   private void internalReqContractDetails(Contract contract, final IInternalHandler processor) {
@@ -552,64 +498,6 @@ public class ApiController implements EWrapper {
       show("Error: no contract details handler for reqId " + reqId);
     }
     recEOM();
-  }
-
-  // ---------------------------------------- Top Market Data handling ----------------------------------------
-  public interface ITopMktDataHandler {
-
-    void tickPrice(TickType tickType, double price, TickAttrib attribs);
-
-    void tickSize(TickType tickType, Decimal size);
-
-    void tickString(TickType tickType, String value);
-
-    void tickSnapshotEnd();
-
-    void marketDataType(int marketDataType);
-
-    void tickReqParams(int tickerId, double minTick, String bboExchange, int snapshotPermissions);
-  }
-
-  public interface IEfpHandler extends ITopMktDataHandler {
-
-    void tickEFP(int tickType, double basisPoints, String formattedBasisPoints,
-        double impliedFuture, int holdDays, String futureLastTradeDate, double dividendImpact,
-        double dividendsToLastTradeDate);
-  }
-
-  public interface IOptHandler extends ITopMktDataHandler {
-
-    void tickOptionComputation(TickType tickType, int tickAttrib, double impliedVol, double delta,
-        double optPrice, double pvDividend, double gamma, double vega, double theta,
-        double undPrice);
-  }
-
-  public static class TopMktDataAdapter implements ITopMktDataHandler {
-
-    @Override
-    public void tickPrice(TickType tickType, double price, TickAttrib attribs) {
-    }
-
-    @Override
-    public void tickSize(TickType tickType, Decimal size) {
-    }
-
-    @Override
-    public void tickString(TickType tickType, String value) {
-    }
-
-    @Override
-    public void tickSnapshotEnd() {
-    }
-
-    @Override
-    public void marketDataType(int marketDataType) {
-    }
-
-    @Override
-    public void tickReqParams(int tickerId, double minTick, String bboExchange,
-        int snapshotPermissions) {
-    }
   }
 
   public void reqTopMktData(Contract contract, String genericTickList, boolean snapshot,
@@ -769,14 +657,6 @@ public class ApiController implements EWrapper {
     recEOM();
   }
 
-
-  // ---------------------------------------- Deep Market Data handling ----------------------------------------
-  public interface IDeepMktDataHandler {
-
-    void updateMktDepth(int position, String marketMaker, DeepType operation, DeepSide side,
-        double price, Decimal size);
-  }
-
   public void reqDeepMktData(Contract contract, int numRows, boolean isSmartDepth,
       IDeepMktDataHandler handler) {
     if (!checkConnection()) {
@@ -869,22 +749,10 @@ public class ApiController implements EWrapper {
       handler.tickOptionComputation(TickType.get(tickType), tickAttrib, impliedVol, delta, optPrice,
           pvDividend, gamma, vega, theta, undPrice);
     } else {
-      System.out.println(
-          String.format("not handled %s %s %s %s %s %s %s %s %s %s", tickType, tickAttrib,
-              impliedVol, delta, optPrice, pvDividend, gamma, vega, theta, undPrice));
+      System.out.printf("not handled %s %s %s %s %s %s %s %s %s %s%n", tickType, tickAttrib,
+          impliedVol, delta, optPrice, pvDividend, gamma, vega, theta, undPrice);
     }
     recEOM();
-  }
-
-
-  // ---------------------------------------- Trade reports ----------------------------------------
-  public interface ITradeReportHandler {
-
-    void tradeReport(String tradeKey, Contract contract, Execution execution);
-
-    void tradeReportEnd();
-
-    void commissionReport(String tradeKey, CommissionReport commissionReport);
   }
 
   public void reqExecutions(ExecutionFilter filter, ITradeReportHandler handler) {
@@ -924,23 +792,6 @@ public class ApiController implements EWrapper {
     }
     recEOM();
   }
-
-  // ---------------------------------------- Advisor info ----------------------------------------
-  public interface IAdvisorHandler {
-
-    void groups(List<Group> groups);
-
-    void profiles(List<Profile> profiles);
-
-    void aliases(List<Alias> aliases);
-
-    void updateGroupsEnd(String text);
-
-    void updateProfilesEnd(String text);
-  }
-
-  private static final int REPLACE_FA_GROUPS_REQ_ID = 0;
-  private static final int REPLACE_FA_PROFILES_REQ_ID = 1;
 
   public void reqAdvisorData(FADataType type, IAdvisorHandler handler) {
     if (!checkConnection()) {
@@ -1017,30 +868,6 @@ public class ApiController implements EWrapper {
     recEOM();
   }
 
-  // ---------------------------------------- Trading and Option Exercise ----------------------------------------
-
-  /**
-   * This interface is for receiving events for a specific order placed from the API. Compare to
-   * ILiveOrderHandler.
-   */
-  public interface IOrderHandler {
-
-    void orderState(OrderState orderState);
-
-    void orderStatus(OrderStatus status, Decimal filled, Decimal remaining, double avgFillPrice,
-        int permId, int parentId, double lastFillPrice, int clientId, String whyHeld,
-        double mktCapPrice);
-
-    void handle(int errorCode, String errorMsg);
-  }
-
-  public interface IOrderCancelHandler {
-
-    void orderStatus(String orderStatus);
-
-    void handle(int errorCode, String errorMsg);
-  }
-
   public void placeOrModifyOrder(Contract contract, final Order order,
       final IOrderHandler handler) {
     if (!checkConnection()) {
@@ -1099,25 +926,6 @@ public class ApiController implements EWrapper {
 
   public void removeOrderCancelHandler(IOrderCancelHandler orderCancelHandler) {
     getAndRemoveKey(m_orderCancelHandlers, orderCancelHandler);
-  }
-
-  // ---------------------------------------- Live order handling ----------------------------------------
-
-  /**
-   * This interface is for downloading and receiving events for all live orders. Compare to
-   * IOrderHandler.
-   */
-  public interface ILiveOrderHandler {
-
-    void openOrder(Contract contract, Order order, OrderState orderState);
-
-    void openOrderEnd();
-
-    void orderStatus(int orderId, OrderStatus status, Decimal filled, Decimal remaining,
-        double avgFillPrice, int permId, int parentId, double lastFillPrice, int clientId,
-        String whyHeld, double mktCapPrice);
-
-    void handle(int orderId, int errorCode, String errorMsg);  // add permId?
   }
 
   public void reqLiveOrders(ILiveOrderHandler handler) {
@@ -1199,16 +1007,7 @@ public class ApiController implements EWrapper {
     recEOM();
   }
 
-
-  // ---------------------------------------- Market Scanners ----------------------------------------
-  public interface IScannerHandler {
-
-    void scannerParameters(String xml);
-
-    void scannerData(int rank, ContractDetails contractDetails, String legsStr);
-
-    void scannerDataEnd();
-  }
+  // ---------------------------------------- Trading and Option Exercise ----------------------------------------
 
   public void reqScannerParameters(IScannerHandler handler) {
     if (!checkConnection()) {
@@ -1271,15 +1070,6 @@ public class ApiController implements EWrapper {
     recEOM();
   }
 
-
-  // ----------------------------------------- Historical data handling ----------------------------------------
-  public interface IHistoricalDataHandler {
-
-    void historicalData(Bar bar);
-
-    void historicalDataEnd();
-  }
-
   /**
    * @param endDateTime format is YYYYMMDD HH:MM:SS [TMZ]
    * @param duration    is number of durationUnits
@@ -1311,6 +1101,8 @@ public class ApiController implements EWrapper {
     }
   }
 
+  // ---------------------------------------- Live order handling ----------------------------------------
+
   @Override
   public void historicalData(int reqId, com.ib.client.Bar bar) {
     IHistoricalDataHandler handler = m_historicalDataMap.get(reqId);
@@ -1324,13 +1116,6 @@ public class ApiController implements EWrapper {
       }
     }
     recEOM();
-  }
-
-
-  //----------------------------------------- Real-time bars --------------------------------------
-  public interface IRealTimeBarHandler {
-
-    void realtimeBar(Bar bar); // time is in seconds since epoch
   }
 
   public void reqRealTimeBars(Contract contract, WhatToShow whatToShow, boolean rthOnly,
@@ -1370,12 +1155,6 @@ public class ApiController implements EWrapper {
     recEOM();
   }
 
-  // ----------------------------------------- Fundamentals handling ----------------------------------------
-  public interface IFundamentalsHandler {
-
-    void fundamentals(String str);
-  }
-
   public void reqFundamentals(Contract contract, FundamentalType reportType,
       IFundamentalsHandler handler) {
     if (!checkConnection()) {
@@ -1395,12 +1174,6 @@ public class ApiController implements EWrapper {
       handler.fundamentals(data);
     }
     recEOM();
-  }
-
-  // ---------------------------------------- Time handling ----------------------------------------
-  public interface ITimeHandler {
-
-    void currentTime(long time);
   }
 
   public void reqCurrentTime(ITimeHandler handler) {
@@ -1429,12 +1202,6 @@ public class ApiController implements EWrapper {
     recEOM();
   }
 
-  // ---------------------------------------- Bulletins handling ----------------------------------------
-  public interface IBulletinHandler {
-
-    void bulletin(int msgId, NewsType newsType, String message, String exchange);
-  }
-
   public void reqBulletins(boolean allMessages, IBulletinHandler handler) {
     if (!checkConnection()) {
       return;
@@ -1457,15 +1224,6 @@ public class ApiController implements EWrapper {
   public void updateNewsBulletin(int msgId, int msgType, String message, String origExchange) {
     m_bulletinHandler.bulletin(msgId, NewsType.get(msgType), message, origExchange);
     recEOM();
-  }
-
-  // ---------------------------------------- Position Multi handling ----------------------------------------
-  public interface IPositionMultiHandler {
-
-    void positionMulti(String account, String modelCode, Contract contract, Decimal pos,
-        double avgCost);
-
-    void positionMultiEnd();
   }
 
   public void reqPositionsMulti(String account, String modelCode, IPositionMultiHandler handler) {
@@ -1508,15 +1266,6 @@ public class ApiController implements EWrapper {
       handler.positionMultiEnd();
     }
     recEOM();
-  }
-
-  // ---------------------------------------- Account Update Multi handling ----------------------------------------
-  public interface IAccountUpdateMultiHandler {
-
-    void accountUpdateMulti(String account, String modelCode, String key, String value,
-        String currency);
-
-    void accountUpdateMultiEnd();
   }
 
   public void reqAccountUpdatesMulti(String account, String modelCode, boolean ledgerAndNLV,
@@ -1586,8 +1335,6 @@ public class ApiController implements EWrapper {
   public void displayGroupUpdated(int reqId, String contractInfo) {
   }
 
-  // ---------------------------------------- other methods ----------------------------------------
-
   /**
    * Not supported in ApiController.
    */
@@ -1611,16 +1358,6 @@ public class ApiController implements EWrapper {
 
   public void show(String string) {
     m_connectionHandler.show(string);
-  }
-
-  private static <K, V> K getAndRemoveKey(Map<K, V> map, V value) {
-    for (Entry<K, V> entry : map.entrySet()) {
-      if (entry.getValue() == value) {
-        map.remove(entry.getKey());
-        return entry.getKey();
-      }
-    }
-    return null;
   }
 
   /**
@@ -1652,15 +1389,6 @@ public class ApiController implements EWrapper {
     sendEOM();
   }
 
-  public interface ISecDefOptParamsReqHandler {
-
-    void securityDefinitionOptionalParameter(String exchange, int underlyingConId,
-        String tradingClass,
-        String multiplier, Set<String> expirations, Set<Double> strikes);
-
-    void securityDefinitionOptionalParameterEnd(int reqId);
-  }
-
   @Override
   public void securityDefinitionOptionalParameter(int reqId, String exchange, int underlyingConId,
       String tradingClass,
@@ -1679,12 +1407,6 @@ public class ApiController implements EWrapper {
     if (handler != null) {
       handler.securityDefinitionOptionalParameterEnd(reqId);
     }
-  }
-
-
-  public interface ISoftDollarTiersReqHandler {
-
-    void softDollarTiers(SoftDollarTier[] tiers);
   }
 
   public void reqSoftDollarTiers(ISoftDollarTiersReqHandler handler) {
@@ -1708,11 +1430,6 @@ public class ApiController implements EWrapper {
     }
   }
 
-  public interface IFamilyCodesHandler {
-
-    void familyCodes(FamilyCode[] familyCodes);
-  }
-
   public void reqFamilyCodes(IFamilyCodesHandler handler) {
     if (!checkConnection()) {
       return;
@@ -1729,11 +1446,6 @@ public class ApiController implements EWrapper {
       handler.familyCodes(familyCodes);
     }
     recEOM();
-  }
-
-  public interface ISymbolSamplesHandler {
-
-    void symbolSamples(ContractDescription[] contractDescriptions);
   }
 
   public void reqMatchingSymbols(String pattern, ISymbolSamplesHandler handler) {
@@ -1767,11 +1479,6 @@ public class ApiController implements EWrapper {
     }
   }
 
-  public interface IMktDepthExchangesHandler {
-
-    void mktDepthExchanges(DepthMktDataDescription[] depthMktDataDescriptions);
-  }
-
   public void reqMktDepthExchanges(IMktDepthExchangesHandler handler) {
     if (!checkConnection()) {
       return;
@@ -1788,12 +1495,6 @@ public class ApiController implements EWrapper {
       handler.mktDepthExchanges(depthMktDataDescriptions);
     }
     recEOM();
-  }
-
-  public interface ITickNewsHandler {
-
-    void tickNews(long timeStamp, String providerCode, String articleId, String headline,
-        String extraData);
   }
 
   public void reqNewsTicks(Contract contract, ITickNewsHandler handler) {
@@ -1817,12 +1518,6 @@ public class ApiController implements EWrapper {
       handler.tickNews(timeStamp, providerCode, articleId, headline, extraData);
     }
     recEOM();
-  }
-
-  public interface ISmartComponentsHandler {
-
-    void smartComponents(int reqId, Map<Integer, Entry<String, Character>> theMap);
-
   }
 
   @Override
@@ -1858,11 +1553,6 @@ public class ApiController implements EWrapper {
     recEOM();
   }
 
-  public interface INewsProvidersHandler {
-
-    void newsProviders(NewsProvider[] newsProviders);
-  }
-
   public void reqNewsProviders(INewsProvidersHandler handler) {
     if (!checkConnection()) {
       return;
@@ -1873,17 +1563,14 @@ public class ApiController implements EWrapper {
     sendEOM();
   }
 
+  // ---------------------------------------- other methods ----------------------------------------
+
   @Override
   public void newsProviders(NewsProvider[] newsProviders) {
     for (INewsProvidersHandler handler : m_newsProvidersHandlers) {
       handler.newsProviders(newsProviders);
     }
     recEOM();
-  }
-
-  public interface INewsArticleHandler {
-
-    void newsArticle(int articleType, String articleText);
   }
 
   public void reqNewsArticle(String providerCode, String articleId, INewsArticleHandler handler) {
@@ -1906,13 +1593,6 @@ public class ApiController implements EWrapper {
       handler.newsArticle(articleType, articleText);
     }
     recEOM();
-  }
-
-  public interface IHistoricalNewsHandler {
-
-    void historicalNews(String time, String providerCodes, String articleId, String headline);
-
-    void historicalNewsEnd(boolean hasMore);
   }
 
   public void reqHistoricalNews(int conId, String providerCodes, String startDateTime,
@@ -1947,12 +1627,6 @@ public class ApiController implements EWrapper {
     recEOM();
   }
 
-  public interface IHeadTimestampHandler {
-
-    void headTimestamp(int reqId, long headTimestamp);
-
-  }
-
   public void reqHeadTimestamp(Contract contract, WhatToShow whatToShow, boolean rthOnly,
       IHeadTimestampHandler handler) {
     if (!checkConnection()) {
@@ -1974,12 +1648,6 @@ public class ApiController implements EWrapper {
     }
 
     recEOM();
-  }
-
-  public interface IHistogramDataHandler {
-
-    void histogramData(int reqId, List<HistogramEntry> items);
-
   }
 
   public void reqHistogramData(Contract contract, int duration, DurationUnit durationUnit,
@@ -2036,11 +1704,6 @@ public class ApiController implements EWrapper {
         + exchange);
   }
 
-  public interface IMarketRuleHandler {
-
-    void marketRule(int marketRuleId, PriceIncrement[] priceIncrements);
-  }
-
   public void reqMarketRule(int marketRuleId, IMarketRuleHandler handler) {
     if (!checkConnection()) {
       return;
@@ -2057,13 +1720,6 @@ public class ApiController implements EWrapper {
       handler.marketRule(marketRuleId, priceIncrements);
     }
     recEOM();
-  }
-
-
-  public interface IPnLHandler {
-
-    void pnl(int reqId, double dailyPnL, double unrealizedPnL, double realizedPnL);
-
   }
 
   public void reqPnL(String account, String modelCode, IPnLHandler handler) {
@@ -2102,13 +1758,6 @@ public class ApiController implements EWrapper {
     recEOM();
   }
 
-  public interface IPnLSingleHandler {
-
-    void pnlSingle(int reqId, Decimal pos, double dailyPnL, double unrealizedPnL,
-        double realizedPnL, double value);
-
-  }
-
   public void reqPnLSingle(String account, String modelCode, int conId, IPnLSingleHandler handler) {
     if (!checkConnection()) {
       return;
@@ -2144,16 +1793,6 @@ public class ApiController implements EWrapper {
     }
 
     recEOM();
-  }
-
-  public interface IHistoricalTickHandler {
-
-    void historicalTick(int reqId, List<HistoricalTick> ticks);
-
-    void historicalTickBidAsk(int reqId, List<HistoricalTickBidAsk> ticks);
-
-    void historicalTickLast(int reqId, List<HistoricalTickLast> ticks);
-
   }
 
   public void reqHistoricalTicks(Contract contract, String startDateTime,
@@ -2220,23 +1859,6 @@ public class ApiController implements EWrapper {
     }
 
     recEOM();
-  }
-
-  public interface ITickByTickDataHandler {
-
-    void tickByTickAllLast(int reqId, int tickType, long time, double price, Decimal size,
-        TickAttribLast tickAttribLast, String exchange, String specialConditions);
-
-    void tickByTickBidAsk(int reqId, long time, double bidPrice, double askPrice, Decimal bidSize,
-        Decimal askSize, TickAttribBidAsk tickAttribBidAsk);
-
-    void tickByTickMidPoint(int reqId, long time, double midPoint);
-
-    void tickByTickHistoricalTickAllLast(int reqId, List<HistoricalTickLast> ticks);
-
-    void tickByTickHistoricalTickBidAsk(int reqId, List<HistoricalTickBidAsk> ticks);
-
-    void tickByTickHistoricalTick(int reqId, List<HistoricalTick> ticks);
   }
 
   public void reqTickByTickData(Contract contract, String tickType, int numberOfTicks,
@@ -2308,14 +1930,6 @@ public class ApiController implements EWrapper {
         + apiOrderId);
   }
 
-  // ---------------------------------------- Completed orders ----------------------------------------
-  public interface ICompletedOrdersHandler {
-
-    void completedOrder(Contract contract, Order order, OrderState orderState);
-
-    void completedOrdersEnd();
-  }
-
   public void reqCompletedOrders(ICompletedOrdersHandler handler) {
     if (!checkConnection()) {
       return;
@@ -2342,12 +1956,6 @@ public class ApiController implements EWrapper {
     recEOM();
   }
 
-  // ---------------------------------------- WSH Meta Data ----------------------------------------
-  public interface IWshMetaDataHandler {
-
-    void wshMetaData(int reqId, String dataJson);
-  }
-
   public void reqWshMetaData(IWshMetaDataHandler handler) {
     if (!checkConnection()) {
       return;
@@ -2357,7 +1965,6 @@ public class ApiController implements EWrapper {
     m_wshMetaDataMap.put(reqId, handler);
     m_client.reqWshMetaData(reqId);
     sendEOM();
-    ;
   }
 
   public void cancelWshMetaData(IWshMetaDataHandler handler) {
@@ -2381,12 +1988,6 @@ public class ApiController implements EWrapper {
     }
 
     recEOM();
-  }
-
-  // ---------------------------------------- WSH Event Data ----------------------------------------
-  public interface IWshEventDataHandler {
-
-    void wshEventData(int reqId, String dataJson);
   }
 
   public void reqWshEventData(WshEventData wshEventData, IWshEventDataHandler handler) {
@@ -2421,13 +2022,6 @@ public class ApiController implements EWrapper {
     }
 
     recEOM();
-  }
-
-  // ---------------------------------------- Historical Schedule ----------------------------------------
-  public interface IHistoricalScheduleHandler {
-
-    void historicalSchedule(int reqId, String startDateTime, String endDateTime, String timeZone,
-        List<HistoricalSession> sessions);
   }
 
   public void reqHistoricalSchedule(Contract contract, String endDateTime, int duration,
@@ -2470,12 +2064,6 @@ public class ApiController implements EWrapper {
     recEOM();
   }
 
-  // ---------------------------------------- User Info handling ----------------------------------------
-  public interface IUserInfoHandler {
-
-    void userInfo(int reqId, String whiteBrandingId);
-  }
-
   public void reqUserInfo(int reqId, IUserInfoHandler handler) {
     if (!checkConnection()) {
       return;
@@ -2490,5 +2078,406 @@ public class ApiController implements EWrapper {
   public void userInfo(int reqId, String whiteBrandingId) {
     m_userInfoHandler.userInfo(reqId, whiteBrandingId);
     recEOM();
+  }
+
+  // ---------------------------------------- Constructor and Connection handling ----------------------------------------
+  public interface IConnectionHandler {
+
+    void connected();
+
+    void disconnected();
+
+    void accountList(List<String> list);
+
+    void error(Exception e);
+
+    void message(int id, int errorCode, String errorMsg, String advancedOrderRejectJson);
+
+    void show(String string);
+  }
+
+  // ---------------------------------------- Account and portfolio updates ----------------------------------------
+  public interface IAccountHandler {
+
+    void accountValue(String account, String key, String value, String currency);
+
+    void accountTime(String timeStamp);
+
+    void accountDownloadEnd(String account);
+
+    void updatePortfolio(Position position);
+  }
+
+  // ---------------------------------------- Account Summary handling ----------------------------------------
+  public interface IAccountSummaryHandler {
+
+    void accountSummary(String account, AccountSummaryTag tag, String value, String currency);
+
+    void accountSummaryEnd();
+  }
+
+  public interface IMarketValueSummaryHandler {
+
+    void marketValueSummary(String account, MarketValueTag tag, String value, String currency);
+
+    void marketValueSummaryEnd();
+  }
+
+  // ---------------------------------------- Position handling ----------------------------------------
+  public interface IPositionHandler {
+
+    void position(String account, Contract contract, Decimal pos, double avgCost);
+
+    void positionEnd();
+  }
+
+  // ---------------------------------------- Contract Details ----------------------------------------
+  public interface IContractDetailsHandler {
+
+    void contractDetails(List<ContractDetails> list);
+  }
+
+  private interface IInternalHandler {
+
+    void contractDetails(ContractDetails data);
+
+    void contractDetailsEnd();
+  }
+
+  // ---------------------------------------- Top Market Data handling ----------------------------------------
+  public interface ITopMktDataHandler {
+
+    void tickPrice(TickType tickType, double price, TickAttrib attribs);
+
+    void tickSize(TickType tickType, Decimal size);
+
+    void tickString(TickType tickType, String value);
+
+    void tickSnapshotEnd();
+
+    void marketDataType(int marketDataType);
+
+    void tickReqParams(int tickerId, double minTick, String bboExchange, int snapshotPermissions);
+  }
+
+
+  public interface IEfpHandler extends ITopMktDataHandler {
+
+    void tickEFP(int tickType, double basisPoints, String formattedBasisPoints,
+        double impliedFuture, int holdDays, String futureLastTradeDate, double dividendImpact,
+        double dividendsToLastTradeDate);
+  }
+
+  public interface IOptHandler extends ITopMktDataHandler {
+
+    void tickOptionComputation(TickType tickType, int tickAttrib, double impliedVol, double delta,
+        double optPrice, double pvDividend, double gamma, double vega, double theta,
+        double undPrice);
+  }
+
+  // ---------------------------------------- Deep Market Data handling ----------------------------------------
+  public interface IDeepMktDataHandler {
+
+    void updateMktDepth(int position, String marketMaker, DeepType operation, DeepSide side,
+        double price, Decimal size);
+  }
+
+  // ---------------------------------------- Trade reports ----------------------------------------
+  public interface ITradeReportHandler {
+
+    void tradeReport(String tradeKey, Contract contract, Execution execution);
+
+    void tradeReportEnd();
+
+    void commissionReport(String tradeKey, CommissionReport commissionReport);
+  }
+
+  // ---------------------------------------- Advisor info ----------------------------------------
+  public interface IAdvisorHandler {
+
+    void groups(List<Group> groups);
+
+    void profiles(List<Profile> profiles);
+
+    void aliases(List<Alias> aliases);
+
+    void updateGroupsEnd(String text);
+
+    void updateProfilesEnd(String text);
+  }
+
+  /**
+   * This interface is for receiving events for a specific order placed from the API. Compare to
+   * ILiveOrderHandler.
+   */
+  public interface IOrderHandler {
+
+    void orderState(OrderState orderState);
+
+    void orderStatus(OrderStatus status, Decimal filled, Decimal remaining, double avgFillPrice,
+        int permId, int parentId, double lastFillPrice, int clientId, String whyHeld,
+        double mktCapPrice);
+
+    void handle(int errorCode, String errorMsg);
+  }
+
+  public interface IOrderCancelHandler {
+
+    void orderStatus(String orderStatus);
+
+    void handle(int errorCode, String errorMsg);
+  }
+
+  /**
+   * This interface is for downloading and receiving events for all live orders. Compare to
+   * IOrderHandler.
+   */
+  public interface ILiveOrderHandler {
+
+    void openOrder(Contract contract, Order order, OrderState orderState);
+
+    void openOrderEnd();
+
+    void orderStatus(int orderId, OrderStatus status, Decimal filled, Decimal remaining,
+        double avgFillPrice, int permId, int parentId, double lastFillPrice, int clientId,
+        String whyHeld, double mktCapPrice);
+
+    void handle(int orderId, int errorCode, String errorMsg);  // add permId?
+  }
+
+  // ---------------------------------------- Market Scanners ----------------------------------------
+  public interface IScannerHandler {
+
+    void scannerParameters(String xml);
+
+    void scannerData(int rank, ContractDetails contractDetails, String legsStr);
+
+    void scannerDataEnd();
+  }
+
+  // ----------------------------------------- Historical data handling ----------------------------------------
+  public interface IHistoricalDataHandler {
+
+    void historicalData(Bar bar);
+
+    void historicalDataEnd();
+  }
+
+  //----------------------------------------- Real-time bars --------------------------------------
+  public interface IRealTimeBarHandler {
+
+    void realtimeBar(Bar bar); // time is in seconds since epoch
+  }
+
+  // ----------------------------------------- Fundamentals handling ----------------------------------------
+  public interface IFundamentalsHandler {
+
+    void fundamentals(String str);
+  }
+
+  // ---------------------------------------- Time handling ----------------------------------------
+  public interface ITimeHandler {
+
+    void currentTime(long time);
+  }
+
+  // ---------------------------------------- Bulletins handling ----------------------------------------
+  public interface IBulletinHandler {
+
+    void bulletin(int msgId, NewsType newsType, String message, String exchange);
+  }
+
+  // ---------------------------------------- Position Multi handling ----------------------------------------
+  public interface IPositionMultiHandler {
+
+    void positionMulti(String account, String modelCode, Contract contract, Decimal pos,
+        double avgCost);
+
+    void positionMultiEnd();
+  }
+
+  // ---------------------------------------- Account Update Multi handling ----------------------------------------
+  public interface IAccountUpdateMultiHandler {
+
+    void accountUpdateMulti(String account, String modelCode, String key, String value,
+        String currency);
+
+    void accountUpdateMultiEnd();
+  }
+
+  public interface ISecDefOptParamsReqHandler {
+
+    void securityDefinitionOptionalParameter(String exchange, int underlyingConId,
+        String tradingClass,
+        String multiplier, Set<String> expirations, Set<Double> strikes);
+
+    void securityDefinitionOptionalParameterEnd(int reqId);
+  }
+
+  public interface ISoftDollarTiersReqHandler {
+
+    void softDollarTiers(SoftDollarTier[] tiers);
+  }
+
+  public interface IFamilyCodesHandler {
+
+    void familyCodes(FamilyCode[] familyCodes);
+  }
+
+  public interface ISymbolSamplesHandler {
+
+    void symbolSamples(ContractDescription[] contractDescriptions);
+  }
+
+  public interface IMktDepthExchangesHandler {
+
+    void mktDepthExchanges(DepthMktDataDescription[] depthMktDataDescriptions);
+  }
+
+  public interface ITickNewsHandler {
+
+    void tickNews(long timeStamp, String providerCode, String articleId, String headline,
+        String extraData);
+  }
+
+  public interface ISmartComponentsHandler {
+
+    void smartComponents(int reqId, Map<Integer, Entry<String, Character>> theMap);
+
+  }
+
+  public interface INewsProvidersHandler {
+
+    void newsProviders(NewsProvider[] newsProviders);
+  }
+
+  public interface INewsArticleHandler {
+
+    void newsArticle(int articleType, String articleText);
+  }
+
+  public interface IHistoricalNewsHandler {
+
+    void historicalNews(String time, String providerCodes, String articleId, String headline);
+
+    void historicalNewsEnd(boolean hasMore);
+  }
+
+  public interface IHeadTimestampHandler {
+
+    void headTimestamp(int reqId, long headTimestamp);
+
+  }
+
+  public interface IHistogramDataHandler {
+
+    void histogramData(int reqId, List<HistogramEntry> items);
+
+  }
+
+  public interface IMarketRuleHandler {
+
+    void marketRule(int marketRuleId, PriceIncrement[] priceIncrements);
+  }
+
+  public interface IPnLHandler {
+
+    void pnl(int reqId, double dailyPnL, double unrealizedPnL, double realizedPnL);
+
+  }
+
+  public interface IPnLSingleHandler {
+
+    void pnlSingle(int reqId, Decimal pos, double dailyPnL, double unrealizedPnL,
+        double realizedPnL, double value);
+
+  }
+
+  public interface IHistoricalTickHandler {
+
+    void historicalTick(int reqId, List<HistoricalTick> ticks);
+
+    void historicalTickBidAsk(int reqId, List<HistoricalTickBidAsk> ticks);
+
+    void historicalTickLast(int reqId, List<HistoricalTickLast> ticks);
+
+  }
+
+  public interface ITickByTickDataHandler {
+
+    void tickByTickAllLast(int reqId, int tickType, long time, double price, Decimal size,
+        TickAttribLast tickAttribLast, String exchange, String specialConditions);
+
+    void tickByTickBidAsk(int reqId, long time, double bidPrice, double askPrice, Decimal bidSize,
+        Decimal askSize, TickAttribBidAsk tickAttribBidAsk);
+
+    void tickByTickMidPoint(int reqId, long time, double midPoint);
+
+    void tickByTickHistoricalTickAllLast(int reqId, List<HistoricalTickLast> ticks);
+
+    void tickByTickHistoricalTickBidAsk(int reqId, List<HistoricalTickBidAsk> ticks);
+
+    void tickByTickHistoricalTick(int reqId, List<HistoricalTick> ticks);
+  }
+
+  // ---------------------------------------- Completed orders ----------------------------------------
+  public interface ICompletedOrdersHandler {
+
+    void completedOrder(Contract contract, Order order, OrderState orderState);
+
+    void completedOrdersEnd();
+  }
+
+  // ---------------------------------------- WSH Meta Data ----------------------------------------
+  public interface IWshMetaDataHandler {
+
+    void wshMetaData(int reqId, String dataJson);
+  }
+
+  // ---------------------------------------- WSH Event Data ----------------------------------------
+  public interface IWshEventDataHandler {
+
+    void wshEventData(int reqId, String dataJson);
+  }
+
+  // ---------------------------------------- Historical Schedule ----------------------------------------
+  public interface IHistoricalScheduleHandler {
+
+    void historicalSchedule(int reqId, String startDateTime, String endDateTime, String timeZone,
+        List<HistoricalSession> sessions);
+  }
+
+  // ---------------------------------------- User Info handling ----------------------------------------
+  public interface IUserInfoHandler {
+
+    void userInfo(int reqId, String whiteBrandingId);
+  }
+
+  public static class TopMktDataAdapter implements ITopMktDataHandler {
+
+    @Override
+    public void tickPrice(TickType tickType, double price, TickAttrib attribs) {
+    }
+
+    @Override
+    public void tickSize(TickType tickType, Decimal size) {
+    }
+
+    @Override
+    public void tickString(TickType tickType, String value) {
+    }
+
+    @Override
+    public void tickSnapshotEnd() {
+    }
+
+    @Override
+    public void marketDataType(int marketDataType) {
+    }
+
+    @Override
+    public void tickReqParams(int tickerId, double minTick, String bboExchange,
+        int snapshotPermissions) {
+    }
   }
 }

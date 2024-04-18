@@ -34,13 +34,13 @@ import javax.swing.table.TableCellRenderer;
 
 public class AccountInfoPanel extends JPanel implements INewTab, IAccountHandler {
 
-  private DefaultListModel<String> m_acctList = new DefaultListModel<>();
-  private JList<String> m_accounts = new JList<>(m_acctList);
+  private final DefaultListModel<String> m_acctList = new DefaultListModel<>();
+  private final JList<String> m_accounts = new JList<>(m_acctList);
   private String m_selAcct = "";
-  private MarginModel m_marginModel = new MarginModel();
-  private PortfolioModel m_portfolioModel = new PortfolioModel();
-  private MktValModel m_mktValModel = new MktValModel();
-  private JLabel m_lastUpdated = new JLabel();
+  private final MarginModel m_marginModel = new MarginModel();
+  private final PortfolioModel m_portfolioModel = new PortfolioModel();
+  private final MktValModel m_mktValModel = new MktValModel();
+  private final JLabel m_lastUpdated = new JLabel();
 
   AccountInfoPanel() {
     m_lastUpdated.setHorizontalAlignment(SwingConstants.RIGHT);
@@ -69,6 +69,32 @@ public class AccountInfoPanel extends JPanel implements INewTab, IAccountHandler
     add(m_lastUpdated, BorderLayout.SOUTH);
 
     m_accounts.addListSelectionListener(e -> onChanged());
+  }
+
+  private static boolean isZero(String value) {
+    try {
+      return Double.parseDouble(value) == 0;
+    } catch (Exception e) {
+      return false;
+    }
+  }
+
+  /**
+   * If val is a number, format it with commas and no decimals.
+   */
+  static String format(String val, String currency) {
+    if (val == null || val.length() == 0) {
+      return null;
+    }
+
+    try {
+      double dub = Double.parseDouble(val);
+      val = fmt0(dub);
+    } catch (Exception ignored) {
+    }
+
+    return currency != null && currency.length() > 0
+        ? val + " " + currency : val;
   }
 
   /**
@@ -297,18 +323,17 @@ public class AccountInfoPanel extends JPanel implements INewTab, IAccountHandler
       if (this == obj) {
         return true;
       }
-      if (!(obj instanceof MarginRowKey)) {
+      if (!(obj instanceof MarginRowKey other)) {
         return false;
       }
-      MarginRowKey other = (MarginRowKey) obj;
       return m_tag.equals(other.m_tag) && Objects.equals(m_currency, other.m_currency);
     }
   }
 
   static class MktValModel extends AbstractTableModel {
 
-    private Map<String, MktValRow> m_map = new HashMap<>();
-    private List<MktValRow> m_list = new ArrayList<>();
+    private final Map<String, MktValRow> m_map = new HashMap<>();
+    private final List<MktValRow> m_list = new ArrayList<>();
 
     void handle(String account, String currency, MarketValueTag mvTag, String value) {
       String key = account + currency;
@@ -389,8 +414,8 @@ public class AccountInfoPanel extends JPanel implements INewTab, IAccountHandler
    */
   static class PortfolioModel extends AbstractTableModel {
 
-    private Map<Integer, Position> m_portfolioMap = new HashMap<>();
-    private List<Integer> m_positions = new ArrayList<>(); // must store key because Position is overwritten
+    private final Map<Integer, Position> m_portfolioMap = new HashMap<>();
+    private final List<Integer> m_positions = new ArrayList<>(); // must store key because Position is overwritten
 
     void clear() {
       m_positions.clear();
@@ -470,38 +495,12 @@ public class AccountInfoPanel extends JPanel implements INewTab, IAccountHandler
     }
   }
 
-  private static boolean isZero(String value) {
-    try {
-      return Double.parseDouble(value) == 0;
-    } catch (Exception e) {
-      return false;
-    }
-  }
-
-  /**
-   * If val is a number, format it with commas and no decimals.
-   */
-  static String format(String val, String currency) {
-    if (val == null || val.length() == 0) {
-      return null;
-    }
-
-    try {
-      double dub = Double.parseDouble(val);
-      val = fmt0(dub);
-    } catch (Exception ignored) {
-    }
-
-    return currency != null && currency.length() > 0
-        ? val + " " + currency : val;
-  }
-
   /**
    * Table where first n columns are left-justified, all other columns are right-justified.
    */
   static class Table extends JTable {
 
-    private int m_n;
+    private final int m_n;
 
     public Table(AbstractTableModel model) {
       this(model, 1);

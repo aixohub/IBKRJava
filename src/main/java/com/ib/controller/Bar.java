@@ -22,6 +22,39 @@ public class Bar {
   private final Decimal m_volume;
   private final int m_count;
 
+  public Bar(long time, double high, double low, double open, double close, Decimal wap,
+      Decimal volume, int count) {
+    m_time = time;
+    m_timeStr = null;
+    m_high = high;
+    m_low = low;
+    m_open = open;
+    m_close = close;
+    m_wap = wap;
+    m_volume = volume;
+    m_count = count;
+  }
+
+  public Bar(String timeStr, double high, double low, double open, double close, Decimal wap,
+      Decimal volume, int count) {
+    m_time = Long.MAX_VALUE;
+    m_timeStr = timeStr;
+    m_high = high;
+    m_low = low;
+    m_open = open;
+    m_close = close;
+    m_wap = wap;
+    m_volume = volume;
+    m_count = count;
+  }
+
+  /**
+   * Format for query.
+   */
+  public static String format(long ms) {
+    return FORMAT_CACHE.get().format(new Date(ms));
+  }
+
   public long time() {
     return m_time;
   }
@@ -58,41 +91,8 @@ public class Bar {
     return m_count;
   }
 
-  public Bar(long time, double high, double low, double open, double close, Decimal wap,
-      Decimal volume, int count) {
-    m_time = time;
-    m_timeStr = null;
-    m_high = high;
-    m_low = low;
-    m_open = open;
-    m_close = close;
-    m_wap = wap;
-    m_volume = volume;
-    m_count = count;
-  }
-
-  public Bar(String timeStr, double high, double low, double open, double close, Decimal wap,
-      Decimal volume, int count) {
-    m_time = Long.MAX_VALUE;
-    m_timeStr = timeStr;
-    m_high = high;
-    m_low = low;
-    m_open = open;
-    m_close = close;
-    m_wap = wap;
-    m_volume = volume;
-    m_count = count;
-  }
-
   public String formattedTime() {
     return Formats.fmtDate(m_time * 1000);
-  }
-
-  /**
-   * Format for query.
-   */
-  public static String format(long ms) {
-    return FORMAT_CACHE.get().format(new Date(ms));
   }
 
   @Override

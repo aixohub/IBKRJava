@@ -20,101 +20,121 @@ import javax.swing.table.AbstractTableModel;
 
 
 public class FamilyCodesPanel extends NewTabPanel {
-	private FamilyCodesModel m_model = new FamilyCodesModel();
 
-	FamilyCodesPanel() {
-		HtmlButton requestFamilyCodesButton = new HtmlButton( "Request Family Codes") {
-			protected void actionPerformed() {
-				requestFamilyCodes();
-			}
-		};
+  private final FamilyCodesModel m_model = new FamilyCodesModel();
 
-		HtmlButton clearFamilyCodesButton = new HtmlButton( "Clear Family Codes") {
-			protected void actionPerformed() {
-				clearFamilyCodes();
-			}
-		};
+  FamilyCodesPanel() {
+    HtmlButton requestFamilyCodesButton = new HtmlButton("Request Family Codes") {
+      protected void actionPerformed() {
+        requestFamilyCodes();
+      }
+    };
 
-		JPanel buts = new VerticalPanel();
-		buts.add( requestFamilyCodesButton);
-		buts.add( clearFamilyCodesButton);
+    HtmlButton clearFamilyCodesButton = new HtmlButton("Clear Family Codes") {
+      protected void actionPerformed() {
+        clearFamilyCodes();
+      }
+    };
 
-		JTable table = new Table( m_model, 2);
-		JScrollPane scroll = new JScrollPane( table);
+    JPanel buts = new VerticalPanel();
+    buts.add(requestFamilyCodesButton);
+    buts.add(clearFamilyCodesButton);
 
-		setLayout( new BorderLayout() );
-		add( scroll);
-		add( buts, BorderLayout.EAST);
-	}
+    JTable table = new Table(m_model, 2);
+    JScrollPane scroll = new JScrollPane(table);
 
-	/** Called when the tab is first visited. */
-	@Override public void activated() { /* noop */ }
+    setLayout(new BorderLayout());
+    add(scroll);
+    add(buts, BorderLayout.EAST);
+  }
 
-	/** Called when the tab is closed by clicking the X. */
-	@Override public void closed() {
-		clearFamilyCodes();
-	}
+  /**
+   * Called when the tab is first visited.
+   */
+  @Override
+  public void activated() { /* noop */ }
 
-	private void requestFamilyCodes() {
-		ApiDemo.INSTANCE.controller().reqFamilyCodes( m_model);
-	}
+  /**
+   * Called when the tab is closed by clicking the X.
+   */
+  @Override
+  public void closed() {
+    clearFamilyCodes();
+  }
 
-	private void clearFamilyCodes() {
-		m_model.clear();
-	}
+  private void requestFamilyCodes() {
+    ApiDemo.INSTANCE.controller().reqFamilyCodes(m_model);
+  }
 
-	private class FamilyCodesModel extends AbstractTableModel implements IFamilyCodesHandler {
-		List<FamilyCodeRow> m_list = new ArrayList<>();
+  private void clearFamilyCodes() {
+    m_model.clear();
+  }
 
-		@Override public void familyCodes(FamilyCode[] familyCodes) {
-			for (FamilyCode familyCode : familyCodes){
-				FamilyCodeRow row = new FamilyCodeRow();
-				m_list.add( row);
-				row.update(familyCode.accountID(), familyCode.familyCodeStr());
-			}
-			m_model.fireTableDataChanged();
-		}
+  private static class FamilyCodeRow {
 
-		public void clear() {
-			m_list.clear();
-			fireTableDataChanged();
-		}
+    String m_accountID;
+    String m_familyCodeStr;
 
-		@Override public int getRowCount() {
-			return m_list.size();
-		}
+    void update(String accountID, String familyCodeStr) {
+      m_accountID = accountID;
+      m_familyCodeStr = familyCodeStr;
+    }
+  }
 
-		@Override public int getColumnCount() {
-			return 2;
-		}
+  private class FamilyCodesModel extends AbstractTableModel implements IFamilyCodesHandler {
 
-		@Override public String getColumnName(int col) {
-			switch( col) {
-				case 0: return "Account ID";
-				case 1: return "Family Code";
-				default: return null;
-			}
-		}
+    List<FamilyCodeRow> m_list = new ArrayList<>();
 
-		@Override public Object getValueAt(int rowIn, int col) {
-			FamilyCodeRow row = m_list.get( rowIn);
-			
-			switch( col) {
-				case 0: return row.m_accountID;
-				case 1: return row.m_familyCodeStr;
-				default: return null;
-			}
-		}
+    @Override
+    public void familyCodes(FamilyCode[] familyCodes) {
+      for (FamilyCode familyCode : familyCodes) {
+        FamilyCodeRow row = new FamilyCodeRow();
+        m_list.add(row);
+        row.update(familyCode.accountID(), familyCode.familyCodeStr());
+      }
+      m_model.fireTableDataChanged();
+    }
 
-	}
+    public void clear() {
+      m_list.clear();
+      fireTableDataChanged();
+    }
 
-	private static class FamilyCodeRow {
-		String m_accountID;
-		String m_familyCodeStr;
+    @Override
+    public int getRowCount() {
+      return m_list.size();
+    }
 
-		void update(String accountID, String familyCodeStr) {
-			m_accountID = accountID;
-			m_familyCodeStr = familyCodeStr;
-		}
-	}
+    @Override
+    public int getColumnCount() {
+      return 2;
+    }
+
+    @Override
+    public String getColumnName(int col) {
+      switch (col) {
+        case 0:
+          return "Account ID";
+        case 1:
+          return "Family Code";
+        default:
+          return null;
+      }
+    }
+
+    @Override
+    public Object getValueAt(int rowIn, int col) {
+      FamilyCodeRow row = m_list.get(rowIn);
+
+      switch (col) {
+        case 0:
+          return row.m_accountID;
+        case 1:
+          return row.m_familyCodeStr;
+        default:
+          return null;
+      }
+    }
+
+  }
 }

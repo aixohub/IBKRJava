@@ -10,6 +10,9 @@ import java.io.ObjectOutput;
 public class ExecutionCondition extends OrderCondition {
 
   public static final OrderConditionType conditionType = OrderConditionType.Execution;
+  private String m_exchange;
+  private String m_secType;
+  private String m_symbol;
 
   protected ExecutionCondition() {
   }
@@ -37,10 +40,6 @@ public class ExecutionCondition extends OrderCondition {
     out.writeUTF(m_exchange);
     out.writeUTF(m_symbol);
   }
-
-  private String m_exchange;
-  private String m_secType;
-  private String m_symbol;
 
   public String exchange() {
     return m_exchange;

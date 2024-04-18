@@ -10,6 +10,9 @@ import java.util.List;
 
 public abstract class ContractCondition extends OperatorCondition {
 
+  private int m_conId;
+  private String m_exchange;
+
   @Override
   public String toString() {
     return toString(null);
@@ -29,9 +32,6 @@ public abstract class ContractCondition extends OperatorCondition {
 
     return type() + " of " + strContract + super.toString();
   }
-
-  private int m_conId;
-  private String m_exchange;
 
   @Override
   public void readFrom(ObjectInput in) throws IOException {

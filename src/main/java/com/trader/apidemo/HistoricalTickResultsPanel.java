@@ -21,70 +21,72 @@ import javax.swing.JTable;
 
 class HistoricalTickResultsPanel extends NewTabPanel implements IHistoricalTickHandler {
 
-    HistoricalTickResultsPanel() {
-        m_table = new JTable(m_tickModel);
-        JScrollPane scroll = new JScrollPane(m_table) {
-            public Dimension getPreferredSize() {
-                Dimension d = super.getPreferredSize();
-                
-                d.width = 500;
-                
-                return d;
-            }
-        };
+  private final List<HistoricalTick> m_historicalTickRows = new ArrayList<>();
+  private final HistoricalTickModel m_tickModel = new HistoricalTickModel(m_historicalTickRows);
+  private final List<HistoricalTickBidAsk> m_historicalTickBidAsk = new ArrayList<>();
+  private final HistoricalTickBidAskModel m_tickBidAskModel = new HistoricalTickBidAskModel(
+      m_historicalTickBidAsk);
+  private final List<HistoricalTickLast> m_historicalTickLast = new ArrayList<>();
+  private final HistoricalTickLastModel m_tickLastModel = new HistoricalTickLastModel(
+      m_historicalTickLast);
+  private final JTable m_table;
 
-        setLayout(new GridLayout());
-        StackPanel hTicksPanel = new StackPanel();
-        
-        hTicksPanel.add(new JLabel("Historical ticks:"));
-        hTicksPanel.add(scroll, BorderLayout.WEST);
-        add(hTicksPanel);
-    }
-    
-    private final List<HistoricalTick> m_historicalTickRows = new ArrayList<>(); 
-    private final HistoricalTickModel m_tickModel = new HistoricalTickModel(m_historicalTickRows);
-    
-    @Override
-    public void historicalTick(int reqId, List<HistoricalTick> ticks) {
-        for (HistoricalTick tick : ticks) {
-            m_historicalTickRows.add(tick);
-        }
-        
-        m_table.setModel(m_tickModel);
-        m_tickModel.fireTableDataChanged();
-    }
+  HistoricalTickResultsPanel() {
+    m_table = new JTable(m_tickModel);
+    JScrollPane scroll = new JScrollPane(m_table) {
+      public Dimension getPreferredSize() {
+        Dimension d = super.getPreferredSize();
 
-    private final List<HistoricalTickBidAsk> m_historicalTickBidAsk = new ArrayList<>();
-    private final HistoricalTickBidAskModel m_tickBidAskModel = new HistoricalTickBidAskModel(m_historicalTickBidAsk);   
-    
-    @Override
-    public void historicalTickBidAsk(int reqId, List<HistoricalTickBidAsk> ticks) {
-        for (HistoricalTickBidAsk tick : ticks) {
-            m_historicalTickBidAsk.add(tick);
-        }
-        
-        m_table.setModel(m_tickBidAskModel);
-        m_tickBidAskModel.fireTableDataChanged();
+        d.width = 500;
+
+        return d;
+      }
+    };
+
+    setLayout(new GridLayout());
+    StackPanel hTicksPanel = new StackPanel();
+
+    hTicksPanel.add(new JLabel("Historical ticks:"));
+    hTicksPanel.add(scroll, BorderLayout.WEST);
+    add(hTicksPanel);
+  }
+
+  @Override
+  public void historicalTick(int reqId, List<HistoricalTick> ticks) {
+    for (HistoricalTick tick : ticks) {
+      m_historicalTickRows.add(tick);
     }
 
-    private final List<HistoricalTickLast> m_historicalTickLast = new ArrayList<>();
-    private final HistoricalTickLastModel m_tickLastModel = new HistoricalTickLastModel(m_historicalTickLast);
-    private JTable m_table;
+    m_table.setModel(m_tickModel);
+    m_tickModel.fireTableDataChanged();
+  }
 
-    @Override
-    public void historicalTickLast(int reqId, List<HistoricalTickLast> ticks) {
-        for (HistoricalTickLast tick : ticks) {
-            m_historicalTickLast.add(tick);
-        }
-        
-        m_table.setModel(m_tickLastModel);
-        m_tickLastModel.fireTableDataChanged();        
+  @Override
+  public void historicalTickBidAsk(int reqId, List<HistoricalTickBidAsk> ticks) {
+    for (HistoricalTickBidAsk tick : ticks) {
+      m_historicalTickBidAsk.add(tick);
     }
 
-    @Override
-    public void activated() { }
+    m_table.setModel(m_tickBidAskModel);
+    m_tickBidAskModel.fireTableDataChanged();
+  }
 
-    @Override
-    public void closed() { }
-    
+  @Override
+  public void historicalTickLast(int reqId, List<HistoricalTickLast> ticks) {
+    for (HistoricalTickLast tick : ticks) {
+      m_historicalTickLast.add(tick);
+    }
+
+    m_table.setModel(m_tickLastModel);
+    m_tickLastModel.fireTableDataChanged();
+  }
+
+  @Override
+  public void activated() {
+  }
+
+  @Override
+  public void closed() {
+  }
+
 }

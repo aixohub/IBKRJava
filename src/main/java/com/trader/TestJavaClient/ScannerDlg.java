@@ -3,12 +3,13 @@
 
 package com.trader.TestJavaClient;
 
+import com.ib.client.ScannerSubscription;
+import com.ib.client.TagValue;
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.GridBagConstraints;
 import java.util.ArrayList;
 import java.util.List;
-
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
@@ -17,69 +18,46 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
-import com.ib.client.ScannerSubscription;
-import com.ib.client.TagValue;
-
 public class ScannerDlg extends JDialog {
 
   public static final int NO_SELECTION = 0;
   public static final int SUBSCRIBE_SELECTION = 1;
   public static final int CANCEL_SELECTION = 2;
   public static final int REQUEST_PARAMETERS_SELECTION = 3;
-
+  private static final int COL1_WIDTH = 30;
+  private static final int COL2_WIDTH = 100 - COL1_WIDTH;
   public int m_userSelection = NO_SELECTION;
   public int m_id;
   public ScannerSubscription m_subscription = new ScannerSubscription();
   private List<TagValue> m_scannerSubscriptionOptions = new ArrayList<>();
   private List<TagValue> m_scannerFilterOptions = new ArrayList<>();
-
-  private JTextField m_Id = new JTextField("0");
-  private JTextField m_numberOfRows = new JTextField("10");
-  private JTextField m_instrument = new JTextField("STK");
-  private JTextField m_locationCode = new JTextField("STK.US.MAJOR");
-  private JTextField m_scanCode = new JTextField("HIGH_OPT_VOLUME_PUT_CALL_RATIO");
-  private JTextField m_abovePrice = new JTextField("3");
-  private JTextField m_belowPrice = new JTextField();
-  private JTextField m_aboveVolume = new JTextField("0");
-  private JTextField m_averageOptionVolumeAbove = new JTextField("0");
-  private JTextField m_marketCapAbove = new JTextField("100000000");
-  private JTextField m_marketCapBelow = new JTextField();
-  private JTextField m_moodyRatingAbove = new JTextField();
-  private JTextField m_moodyRatingBelow = new JTextField();
-  private JTextField m_spRatingAbove = new JTextField();
-  private JTextField m_spRatingBelow = new JTextField();
-  private JTextField m_maturityDateAbove = new JTextField();
-  private JTextField m_maturityDateBelow = new JTextField();
-  private JTextField m_couponRateAbove = new JTextField();
-  private JTextField m_couponRateBelow = new JTextField();
-  private JTextField m_excludeConvertible = new JTextField("0");
-  private JTextField m_scannerSettingPairs = new JTextField("Annual,true");
-  private JTextField m_stockTypeFilter = new JTextField("ALL");
-
-  private JButton m_requestParameters = new JButton("Request Parameters");
-  private JButton m_subscribe = new JButton("Subscribe");
-  private JButton m_cancel = new JButton("Cancel Subscription");
-  private JButton m_options = new JButton("Options");
-  private JButton m_filterOptions = new JButton("Filter");
-
-  private static final int COL1_WIDTH = 30;
-  private static final int COL2_WIDTH = 100 - COL1_WIDTH;
-
-  List<TagValue> scannerSubscriptionOptions() {
-    return m_scannerSubscriptionOptions;
-  }
-
-  List<TagValue> scannerFilterOptions() {
-    return m_scannerFilterOptions;
-  }
-
-  private static void addGBComponent(IBGridBagPanel panel, Component comp,
-      GridBagConstraints gbc, int weightx, int gridwidth) {
-    gbc.weightx = weightx;
-    gbc.gridwidth = gridwidth;
-    panel.setConstraints(comp, gbc);
-    panel.add(comp, gbc);
-  }
+  private final JTextField m_Id = new JTextField("0");
+  private final JTextField m_numberOfRows = new JTextField("10");
+  private final JTextField m_instrument = new JTextField("STK");
+  private final JTextField m_locationCode = new JTextField("STK.US.MAJOR");
+  private final JTextField m_scanCode = new JTextField("HIGH_OPT_VOLUME_PUT_CALL_RATIO");
+  private final JTextField m_abovePrice = new JTextField("3");
+  private final JTextField m_belowPrice = new JTextField();
+  private final JTextField m_aboveVolume = new JTextField("0");
+  private final JTextField m_averageOptionVolumeAbove = new JTextField("0");
+  private final JTextField m_marketCapAbove = new JTextField("100000000");
+  private final JTextField m_marketCapBelow = new JTextField();
+  private final JTextField m_moodyRatingAbove = new JTextField();
+  private final JTextField m_moodyRatingBelow = new JTextField();
+  private final JTextField m_spRatingAbove = new JTextField();
+  private final JTextField m_spRatingBelow = new JTextField();
+  private final JTextField m_maturityDateAbove = new JTextField();
+  private final JTextField m_maturityDateBelow = new JTextField();
+  private final JTextField m_couponRateAbove = new JTextField();
+  private final JTextField m_couponRateBelow = new JTextField();
+  private final JTextField m_excludeConvertible = new JTextField("0");
+  private final JTextField m_scannerSettingPairs = new JTextField("Annual,true");
+  private final JTextField m_stockTypeFilter = new JTextField("ALL");
+  private final JButton m_requestParameters = new JButton("Request Parameters");
+  private final JButton m_subscribe = new JButton("Subscribe");
+  private final JButton m_cancel = new JButton("Cancel Subscription");
+  private final JButton m_options = new JButton("Options");
+  private final JButton m_filterOptions = new JButton("Filter");
 
   public ScannerDlg(SampleFrame owner) {
     super(owner, true);
@@ -214,14 +192,12 @@ public class ScannerDlg extends JDialog {
     pack();
   }
 
-  private void onFilter() {
-    SmartComboRoutingParamsDlg smartComboRoutingParamsDlg = new SmartComboRoutingParamsDlg(
-        "Scanner Subscription Filter Options", m_scannerFilterOptions, this);
-
-    // show smart combo routing params dialog
-    smartComboRoutingParamsDlg.setVisible(true);
-
-    m_scannerFilterOptions = smartComboRoutingParamsDlg.smartComboRoutingParams();
+  private static void addGBComponent(IBGridBagPanel panel, Component comp,
+      GridBagConstraints gbc, int weightx, int gridwidth) {
+    gbc.weightx = weightx;
+    gbc.gridwidth = gridwidth;
+    panel.setConstraints(comp, gbc);
+    panel.add(comp, gbc);
   }
 
   private static double parseDouble(JTextField textfield) {
@@ -238,6 +214,24 @@ public class ScannerDlg extends JDialog {
     } catch (Exception ex) {
       return Integer.MAX_VALUE;
     }
+  }
+
+  List<TagValue> scannerSubscriptionOptions() {
+    return m_scannerSubscriptionOptions;
+  }
+
+  List<TagValue> scannerFilterOptions() {
+    return m_scannerFilterOptions;
+  }
+
+  private void onFilter() {
+    SmartComboRoutingParamsDlg smartComboRoutingParamsDlg = new SmartComboRoutingParamsDlg(
+        "Scanner Subscription Filter Options", m_scannerFilterOptions, this);
+
+    // show smart combo routing params dialog
+    smartComboRoutingParamsDlg.setVisible(true);
+
+    m_scannerFilterOptions = smartComboRoutingParamsDlg.smartComboRoutingParams();
   }
 
   private void onSubscribe() {

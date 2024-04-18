@@ -6,6 +6,7 @@ package com.ib.client;
 public class TimeCondition extends OperatorCondition {
 
   public static final OrderConditionType conditionType = OrderConditionType.Time;
+  private String m_time;
 
   protected TimeCondition() {
   }
@@ -14,8 +15,6 @@ public class TimeCondition extends OperatorCondition {
   public String toString() {
     return "time" + super.toString();
   }
-
-  private String m_time;
 
   public String time() {
     return m_time;

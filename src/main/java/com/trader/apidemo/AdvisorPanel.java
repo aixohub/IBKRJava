@@ -161,52 +161,6 @@ public class AdvisorPanel extends NewTabPanel implements IAdvisorHandler {
     }
   }
 
-  private class GroupsPanel extends JPanel {
-
-    GroupsPanel() {
-      JScrollPane groupScroll = new JScrollPane(m_groupTable);
-      groupScroll.setBorder(new TitledBorder("Groups"));
-
-      HtmlButton create = new HtmlButton("Create Group") {
-        @Override
-        protected void actionPerformed() {
-          onCreateGroup();
-        }
-      };
-
-      HtmlButton update = new HtmlButton("Update") {
-        @Override
-        protected void actionPerformed() {
-          onTransmit();
-        }
-      };
-
-      JPanel buts = new VerticalPanel();
-      buts.add(create);
-      buts.add(update);
-
-      setLayout(new BorderLayout());
-      add(groupScroll);
-      add(buts, BorderLayout.EAST);
-    }
-
-    void onCreateGroup() {
-      String name = JOptionPane.showInputDialog(this, "Enter group name");
-      if (name != null) {
-        m_groupModel.add(name);
-      }
-    }
-
-    void onTransmit() {
-      int rc = JOptionPane.showConfirmDialog(this,
-          "This will replace all Groups in TWS with the ones shown here.\nAre you sure you want to do that?",
-          "Confirm", JOptionPane.YES_NO_OPTION);
-      if (rc == 0) {
-        m_groupModel.transmit();
-      }
-    }
-  }
-
   private static class GroupModel extends AbstractTableModel {
 
     TCombo<Method> combo = new TCombo<>(Method.values());
@@ -297,52 +251,6 @@ public class AdvisorPanel extends NewTabPanel implements IAdvisorHandler {
           break;
         default:
           break;
-      }
-    }
-  }
-
-  private class ProfilesPanel extends JPanel {
-
-    ProfilesPanel() {
-      JScrollPane profileScroll = new JScrollPane(m_profileTable);
-      profileScroll.setBorder(new TitledBorder("Profiles"));
-
-      HtmlButton create = new HtmlButton("Create Profile") {
-        @Override
-        protected void actionPerformed() {
-          onCreateProfile();
-        }
-      };
-
-      HtmlButton update = new HtmlButton("Update") {
-        @Override
-        protected void actionPerformed() {
-          onTransmit();
-        }
-      };
-
-      JPanel buts = new VerticalPanel();
-      buts.add(create);
-      buts.add(update);
-
-      setLayout(new BorderLayout());
-      add(profileScroll);
-      add(buts, BorderLayout.EAST);
-    }
-
-    void onCreateProfile() {
-      String name = JOptionPane.showInputDialog(this, "Enter profile name");
-      if (name != null) {
-        m_profileModel.add(name);
-      }
-    }
-
-    void onTransmit() {
-      int rc = JOptionPane.showConfirmDialog(this,
-          "This will replace all Profiles in TWS with the ones shown here.\nAre you sure you want to do that?",
-          "Confirm", JOptionPane.YES_NO_OPTION);
-      if (rc == 0) {
-        m_profileModel.transmit();
       }
     }
   }
@@ -439,6 +347,98 @@ public class AdvisorPanel extends NewTabPanel implements IAdvisorHandler {
           break;
         default:
           break;
+      }
+    }
+  }
+
+  private class GroupsPanel extends JPanel {
+
+    GroupsPanel() {
+      JScrollPane groupScroll = new JScrollPane(m_groupTable);
+      groupScroll.setBorder(new TitledBorder("Groups"));
+
+      HtmlButton create = new HtmlButton("Create Group") {
+        @Override
+        protected void actionPerformed() {
+          onCreateGroup();
+        }
+      };
+
+      HtmlButton update = new HtmlButton("Update") {
+        @Override
+        protected void actionPerformed() {
+          onTransmit();
+        }
+      };
+
+      JPanel buts = new VerticalPanel();
+      buts.add(create);
+      buts.add(update);
+
+      setLayout(new BorderLayout());
+      add(groupScroll);
+      add(buts, BorderLayout.EAST);
+    }
+
+    void onCreateGroup() {
+      String name = JOptionPane.showInputDialog(this, "Enter group name");
+      if (name != null) {
+        m_groupModel.add(name);
+      }
+    }
+
+    void onTransmit() {
+      int rc = JOptionPane.showConfirmDialog(this,
+          "This will replace all Groups in TWS with the ones shown here.\nAre you sure you want to do that?",
+          "Confirm", JOptionPane.YES_NO_OPTION);
+      if (rc == 0) {
+        m_groupModel.transmit();
+      }
+    }
+  }
+
+  private class ProfilesPanel extends JPanel {
+
+    ProfilesPanel() {
+      JScrollPane profileScroll = new JScrollPane(m_profileTable);
+      profileScroll.setBorder(new TitledBorder("Profiles"));
+
+      HtmlButton create = new HtmlButton("Create Profile") {
+        @Override
+        protected void actionPerformed() {
+          onCreateProfile();
+        }
+      };
+
+      HtmlButton update = new HtmlButton("Update") {
+        @Override
+        protected void actionPerformed() {
+          onTransmit();
+        }
+      };
+
+      JPanel buts = new VerticalPanel();
+      buts.add(create);
+      buts.add(update);
+
+      setLayout(new BorderLayout());
+      add(profileScroll);
+      add(buts, BorderLayout.EAST);
+    }
+
+    void onCreateProfile() {
+      String name = JOptionPane.showInputDialog(this, "Enter profile name");
+      if (name != null) {
+        m_profileModel.add(name);
+      }
+    }
+
+    void onTransmit() {
+      int rc = JOptionPane.showConfirmDialog(this,
+          "This will replace all Profiles in TWS with the ones shown here.\nAre you sure you want to do that?",
+          "Confirm", JOptionPane.YES_NO_OPTION);
+      if (rc == 0) {
+        m_profileModel.transmit();
       }
     }
   }

@@ -5,7 +5,9 @@ package com.ib.client;
 
 public class SoftDollarTier {
 
-  private String m_name, m_value, m_displayName;
+  private String m_name;
+  private String m_value;
+  private final String m_displayName;
 
   public SoftDollarTier(String name, String val, String displayName) {
     name(name);
@@ -51,11 +53,9 @@ public class SoftDollarTier {
       return false;
     }
 
-    if (!(obj instanceof SoftDollarTier)) {
+    if (!(obj instanceof SoftDollarTier other)) {
       return false;
     }
-
-    SoftDollarTier other = (SoftDollarTier) obj;
 
     if (m_name == null) {
       if (other.m_name != null) {
@@ -66,14 +66,9 @@ public class SoftDollarTier {
     }
 
     if (m_value == null) {
-      if (other.m_value != null) {
-        return false;
-      }
-    } else if (Util.StringCompare(m_value, other.m_value) != 0) {
-      return false;
-    }
-
-    return true;
+      return other.m_value == null;
+    } else
+      return Util.StringCompare(m_value, other.m_value) == 0;
   }
 
   @Override

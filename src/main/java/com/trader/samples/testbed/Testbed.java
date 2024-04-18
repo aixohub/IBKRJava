@@ -29,7 +29,7 @@ import java.util.TimeZone;
 public class Testbed {
 
   public static void main(String[] args) throws InterruptedException {
-    samples.testbed.EWrapperImpl wrapper = new samples.testbed.EWrapperImpl();
+    EWrapperImpl wrapper = new EWrapperImpl();
 
     final EClientSocket m_client = wrapper.getClient();
     final EReaderSignal m_signal = wrapper.getSignal();

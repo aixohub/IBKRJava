@@ -14,42 +14,46 @@ import javax.swing.SwingConstants;
 
 
 class ContractDlg extends JDialog {
-	ContractPanel m_contractPanel;
-    
-    ContractDlg( JFrame f, Contract c) {
-    	super( f, true);
-    	
-    	m_contractPanel = new ContractPanel( c);
-    	
-    	setLayout( new BorderLayout() );
-    	
-    	
-    	HtmlButton ok = new HtmlButton( "OK") {
-			@Override public void actionPerformed() {
-				onOK();
-			}
-		};
-		ok.setHorizontalAlignment(SwingConstants.CENTER);
 
-		m_contractPanel.addKeyListener( new KeyListener() {
-			@Override public void keyTyped(KeyEvent e) {
-				System.out.println( "lkj");
-			}
-			
-			@Override public void keyReleased(KeyEvent e) {
-			}
-			
-			@Override public void keyPressed(KeyEvent e) {
-			}
-		});
-    	
-    	add( m_contractPanel);
-    	add( ok, BorderLayout.SOUTH);
-    	pack();
-    }
+  ContractPanel m_contractPanel;
 
-	public void onOK() {
-		m_contractPanel.onOK();
-		setVisible( false);
-	}
+  ContractDlg(JFrame f, Contract c) {
+    super(f, true);
+
+    m_contractPanel = new ContractPanel(c);
+
+    setLayout(new BorderLayout());
+
+    HtmlButton ok = new HtmlButton("OK") {
+      @Override
+      public void actionPerformed() {
+        onOK();
+      }
+    };
+    ok.setHorizontalAlignment(SwingConstants.CENTER);
+
+    m_contractPanel.addKeyListener(new KeyListener() {
+      @Override
+      public void keyTyped(KeyEvent e) {
+        System.out.println("lkj");
+      }
+
+      @Override
+      public void keyReleased(KeyEvent e) {
+      }
+
+      @Override
+      public void keyPressed(KeyEvent e) {
+      }
+    });
+
+    add(m_contractPanel);
+    add(ok, BorderLayout.SOUTH);
+    pack();
+  }
+
+  public void onOK() {
+    m_contractPanel.onOK();
+    setVisible(false);
+  }
 }

@@ -17,56 +17,66 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 
 public class MarketValueSummaryPanel extends NewTabPanel implements IMarketValueSummaryHandler {
-	private MktValModel m_model = new MktValModel();
 
-	MarketValueSummaryPanel() {
-		HtmlButton sub = new HtmlButton( "Subscribe") {
-			protected void actionPerformed() {
-				subscribe();
-			}
-		};
-		
-		HtmlButton desub = new HtmlButton( "Desubscribe") {
-			protected void actionPerformed() {
-				desubscribe();
-			}
-		};
-		
-		JPanel buts = new VerticalPanel();
-		buts.add( sub);
-		buts.add( desub);
+  private final MktValModel m_model = new MktValModel();
 
-		JTable table = new Table( m_model, 2);
-		JScrollPane scroll = new JScrollPane( table);
-		
-		setLayout( new BorderLayout() );
-		add( scroll);
-		add( buts, BorderLayout.EAST);
-	}
+  MarketValueSummaryPanel() {
+    HtmlButton sub = new HtmlButton("Subscribe") {
+      protected void actionPerformed() {
+        subscribe();
+      }
+    };
 
-	/** Called when the tab is first visited. */
-	@Override public void activated() {
-		subscribe();
-	}
+    HtmlButton desub = new HtmlButton("Desubscribe") {
+      protected void actionPerformed() {
+        desubscribe();
+      }
+    };
 
-	/** Called when the tab is closed by clicking the X. */
-	@Override public void closed() {
-		desubscribe();
-	}
+    JPanel buts = new VerticalPanel();
+    buts.add(sub);
+    buts.add(desub);
 
-	private void subscribe() {
-		ApiDemo.INSTANCE.controller().reqMarketValueSummary( "All", this);
-	}
+    JTable table = new Table(m_model, 2);
+    JScrollPane scroll = new JScrollPane(table);
 
-	private void desubscribe() {
-		ApiDemo.INSTANCE.controller().cancelMarketValueSummary( this);
-		m_model.clear();
-	}
+    setLayout(new BorderLayout());
+    add(scroll);
+    add(buts, BorderLayout.EAST);
+  }
 
-	@Override public void marketValueSummary(String account, MarketValueTag tag, String value, String currency) {
-		m_model.handle( account, currency, tag, value);
-	}
+  /**
+   * Called when the tab is first visited.
+   */
+  @Override
+  public void activated() {
+    subscribe();
+  }
 
-	@Override public void marketValueSummaryEnd() {
-	}
+  /**
+   * Called when the tab is closed by clicking the X.
+   */
+  @Override
+  public void closed() {
+    desubscribe();
+  }
+
+  private void subscribe() {
+    ApiDemo.INSTANCE.controller().reqMarketValueSummary("All", this);
+  }
+
+  private void desubscribe() {
+    ApiDemo.INSTANCE.controller().cancelMarketValueSummary(this);
+    m_model.clear();
+  }
+
+  @Override
+  public void marketValueSummary(String account, MarketValueTag tag, String value,
+      String currency) {
+    m_model.handle(account, currency, tag, value);
+  }
+
+  @Override
+  public void marketValueSummaryEnd() {
+  }
 }

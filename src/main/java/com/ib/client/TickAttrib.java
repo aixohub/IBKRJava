@@ -34,10 +34,9 @@ public class TickAttrib {
   }
 
   public String toString() {
-    StringBuilder sb = new StringBuilder();
-    sb.append(m_canAutoExecute ? "canAutoExecute " : "");
-    sb.append(m_pastLimit ? "pastLimit " : "");
-    sb.append(m_preOpen ? "preOpen " : "");
-    return sb.toString();
+    String sb = (m_canAutoExecute ? "canAutoExecute " : "")
+        + (m_pastLimit ? "pastLimit " : "")
+        + (m_preOpen ? "preOpen " : "");
+    return sb;
   }
 }

@@ -109,9 +109,9 @@ public class ComboPanel extends JPanel implements INewTab {
     private final JTable m_legsTable = new JTable(m_legsModel);
     private final TopModel m_mktDataModel;
     private final JTable m_mktDataTable;
-    private DeltaNeutralContract m_dnContract;
     private final DnPanel m_dnPanel = new DnPanel();
     private final JLabel m_dnText = new JLabel();
+    private DeltaNeutralContract m_dnContract;
 
     SpreadsPanel(MarketDataPanel parentPanel) {
       m_mktDataModel = new TopModel(parentPanel);

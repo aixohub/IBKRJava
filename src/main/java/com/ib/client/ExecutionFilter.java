@@ -13,6 +13,21 @@ public class ExecutionFilter {
   private String m_exchange;
   private String m_side;
 
+  public ExecutionFilter() {
+    clientId(0);
+  }
+
+  public ExecutionFilter(int p_clientId, String p_acctCode, String p_time,
+      String p_symbol, String p_secType, String p_exchange, String p_side) {
+    m_clientId = p_clientId;
+    m_acctCode = p_acctCode;
+    m_time = p_time;
+    m_symbol = p_symbol;
+    m_secType = p_secType;
+    m_exchange = p_exchange;
+    m_side = p_side;
+  }
+
   // Get
   public int clientId() {
     return m_clientId;
@@ -71,30 +86,14 @@ public class ExecutionFilter {
     m_side = side;
   }
 
-  public ExecutionFilter() {
-    clientId(0);
-  }
-
-  public ExecutionFilter(int p_clientId, String p_acctCode, String p_time,
-      String p_symbol, String p_secType, String p_exchange, String p_side) {
-    m_clientId = p_clientId;
-    m_acctCode = p_acctCode;
-    m_time = p_time;
-    m_symbol = p_symbol;
-    m_secType = p_secType;
-    m_exchange = p_exchange;
-    m_side = p_side;
-  }
-
   @Override
   public boolean equals(Object p_other) {
     if (this == p_other) {
       return true;
     }
-    if (!(p_other instanceof ExecutionFilter)) {
+    if (!(p_other instanceof ExecutionFilter l_theOther)) {
       return false;
     }
-    ExecutionFilter l_theOther = (ExecutionFilter) p_other;
     return m_clientId == l_theOther.m_clientId &&
         m_acctCode.equalsIgnoreCase(l_theOther.m_acctCode) &&
         m_time.equalsIgnoreCase(l_theOther.m_time) &&

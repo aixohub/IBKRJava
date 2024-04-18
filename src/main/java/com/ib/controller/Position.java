@@ -9,14 +9,26 @@ import com.ib.client.Decimal;
 
 public class Position {
 
-  private Contract m_contract;
-  private String m_account;
-  private Decimal m_position;
-  private double m_marketPrice;
-  private double m_marketValue;
-  private double m_averageCost;
-  private double m_unrealPnl;
-  private double m_realPnl;
+  private final Contract m_contract;
+  private final String m_account;
+  private final Decimal m_position;
+  private final double m_marketPrice;
+  private final double m_marketValue;
+  private final double m_averageCost;
+  private final double m_unrealPnl;
+  private final double m_realPnl;
+
+  public Position(Contract contract, String account, Decimal position, double marketPrice,
+      double marketValue, double averageCost, double unrealPnl, double realPnl) {
+    m_contract = contract;
+    m_account = account;
+    m_position = position;
+    m_marketPrice = marketPrice;
+    m_marketValue = marketValue;
+    m_averageCost = averageCost;
+    m_unrealPnl = unrealPnl;
+    m_realPnl = realPnl;
+  }
 
   public Contract contract() {
     return m_contract;
@@ -52,17 +64,5 @@ public class Position {
 
   public String account() {
     return m_account;
-  }
-
-  public Position(Contract contract, String account, Decimal position, double marketPrice,
-      double marketValue, double averageCost, double unrealPnl, double realPnl) {
-    m_contract = contract;
-    m_account = account;
-    m_position = position;
-    m_marketPrice = marketPrice;
-    m_marketValue = marketValue;
-    m_averageCost = averageCost;
-    m_unrealPnl = unrealPnl;
-    m_realPnl = realPnl;
   }
 }

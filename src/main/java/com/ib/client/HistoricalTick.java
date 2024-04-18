@@ -5,9 +5,9 @@ package com.ib.client;
 
 public class HistoricalTick {
 
-  private long m_time;
-  private double m_price;
-  private Decimal m_size;
+  private final long m_time;
+  private final double m_price;
+  private final Decimal m_size;
 
   public HistoricalTick(long time, double price, Decimal size) {
     m_time = time;

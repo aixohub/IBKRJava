@@ -6,6 +6,7 @@ package com.ib.client;
 public class VolumeCondition extends ContractCondition {
 
   public static final OrderConditionType conditionType = OrderConditionType.Volume;
+  private int m_volume;
 
   protected VolumeCondition() {
   }
@@ -19,8 +20,6 @@ public class VolumeCondition extends ContractCondition {
   public String toString(ContractLookuper lookuper) {
     return super.toString(lookuper);
   }
-
-  private int m_volume;
 
   public int volume() {
     return m_volume;

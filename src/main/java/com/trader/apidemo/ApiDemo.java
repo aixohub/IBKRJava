@@ -32,18 +32,17 @@ import javax.swing.border.EmptyBorder;
 
 public class ApiDemo implements IConnectionHandler {
 
+  public static ApiDemo INSTANCE;
+
   static {
     NewLookAndFeel.register();
   }
-
-  public static ApiDemo INSTANCE;
 
   private final IConnectionConfiguration m_connectionConfiguration;
   private final JTextArea m_inLog = new JTextArea();
   private final JTextArea m_outLog = new JTextArea();
   private final Logger m_inLogger = new Logger(m_inLog);
   private final Logger m_outLogger = new Logger(m_outLog);
-  private ApiController m_controller;
   private final List<String> m_acctList = new ArrayList<>();
   private final JFrame m_frame = new JFrame();
   private final NewTabbedPanel m_tabbedPanel = new NewTabbedPanel(true);
@@ -59,6 +58,21 @@ public class ApiDemo implements IConnectionHandler {
   private final StratPanel m_stratPanel = new StratPanel();
   private final NewsPanel m_newsPanel = new NewsPanel();
   private final JTextArea m_msg = new JTextArea();
+  private ApiController m_controller;
+
+  public ApiDemo(IConnectionConfiguration connectionConfig) {
+    m_connectionConfiguration = connectionConfig;
+    m_connectionPanel = new ConnectionPanel(); // must be done after connection config is set
+  }
+
+  public static void main(String[] args) {
+    start(new ApiDemo(new DefaultConnectionConfiguration()));
+  }
+
+  public static void start(ApiDemo apiDemo) {
+    INSTANCE = apiDemo;
+    INSTANCE.run();
+  }
 
   // getter methods
   List<String> accountList() {
@@ -75,20 +89,6 @@ public class ApiDemo implements IConnectionHandler {
 
   ILogger getOutLogger() {
     return m_outLogger;
-  }
-
-  public static void main(String[] args) {
-    start(new ApiDemo(new DefaultConnectionConfiguration()));
-  }
-
-  public static void start(ApiDemo apiDemo) {
-    INSTANCE = apiDemo;
-    INSTANCE.run();
-  }
-
-  public ApiDemo(IConnectionConfiguration connectionConfig) {
-    m_connectionConfiguration = connectionConfig;
-    m_connectionPanel = new ConnectionPanel(); // must be done after connection config is set
   }
 
   public ApiController controller() {
@@ -191,6 +191,25 @@ public class ApiDemo implements IConnectionHandler {
     show(error);
   }
 
+  private static class Logger implements ILogger {
+
+    final private JTextArea m_area;
+
+    Logger(JTextArea area) {
+      m_area = area;
+    }
+
+    @Override
+    public void log(final String str) {
+      SwingUtilities.invokeLater(() -> {
+//					m_area.append(str);
+//
+//					Dimension d = m_area.getSize();
+//					m_area.scrollRectToVisible( new Rectangle( 0, d.height, 1, 1) );
+      });
+    }
+  }
+
   private class ConnectionPanel extends JPanel {
 
     private final JTextField m_host = new JTextField(m_connectionConfiguration.getDefaultHost(),
@@ -252,25 +271,6 @@ public class ApiDemo implements IConnectionHandler {
       int port = Integer.parseInt(m_port.getText());
       int clientId = Integer.parseInt(m_clientId.getText());
       controller().connect(m_host.getText(), port, clientId, m_connectOptionsTF.getText());
-    }
-  }
-
-  private static class Logger implements ILogger {
-
-    final private JTextArea m_area;
-
-    Logger(JTextArea area) {
-      m_area = area;
-    }
-
-    @Override
-    public void log(final String str) {
-      SwingUtilities.invokeLater(() -> {
-//					m_area.append(str);
-//
-//					Dimension d = m_area.getSize();
-//					m_area.scrollRectToVisible( new Rectangle( 0, d.height, 1, 1) );
-      });
     }
   }
 }

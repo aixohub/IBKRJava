@@ -14,7 +14,7 @@ public class Profile {
 
   private String m_name;
   private Type m_type;
-  private List<Allocation> m_allocations = new ArrayList<>();
+  private final List<Allocation> m_allocations = new ArrayList<>();
 
   public String name() {
     return m_name;

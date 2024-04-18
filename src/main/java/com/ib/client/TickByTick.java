@@ -5,8 +5,8 @@ package com.ib.client;
 
 public class TickByTick {
 
-  private int m_tickType; // 0 - None, 1 - Last, 2 - AllLast, 3 -BidAsk, 4 - MidPoint
-  private long m_time;  // in seconds
+  private final int m_tickType; // 0 - None, 1 - Last, 2 - AllLast, 3 -BidAsk, 4 - MidPoint
+  private final long m_time;  // in seconds
   private double m_price;
   private Decimal m_size;
   private TickAttribLast m_tickAttribLast;
@@ -72,17 +72,15 @@ public class TickByTick {
   }
 
   public String tickAttribLastStr() {
-    StringBuilder sb = new StringBuilder();
-    sb.append(m_tickAttribLast.pastLimit() ? "PastLimit " : "");
-    sb.append(m_tickAttribLast.unreported() ? "Unreported " : "");
-    return sb.toString();
+    String sb = (m_tickAttribLast.pastLimit() ? "PastLimit " : "")
+        + (m_tickAttribLast.unreported() ? "Unreported " : "");
+    return sb;
   }
 
   public String tickAttribBidAskStr() {
-    StringBuilder sb = new StringBuilder();
-    sb.append(m_tickAttribBidAsk.bidPastLow() ? "BidPastLow " : "");
-    sb.append(m_tickAttribBidAsk.askPastHigh() ? "AskPastHigh " : "");
-    return sb.toString();
+    String sb = (m_tickAttribBidAsk.bidPastLow() ? "BidPastLow " : "")
+        + (m_tickAttribBidAsk.askPastHigh() ? "AskPastHigh " : "");
+    return sb;
   }
 
   public String exchange() {

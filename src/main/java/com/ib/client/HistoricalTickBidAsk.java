@@ -5,12 +5,12 @@ package com.ib.client;
 
 public class HistoricalTickBidAsk {
 
-  private long m_time;
-  private TickAttribBidAsk m_tickAttribBidAsk;
-  private double m_priceBid;
-  private double m_priceAsk;
-  private Decimal m_sizeBid;
-  private Decimal m_sizeAsk;
+  private final long m_time;
+  private final TickAttribBidAsk m_tickAttribBidAsk;
+  private final double m_priceBid;
+  private final double m_priceAsk;
+  private final Decimal m_sizeBid;
+  private final Decimal m_sizeAsk;
 
   public HistoricalTickBidAsk(long time, TickAttribBidAsk tickAttribBidAsk, double priceBid,
       double priceAsk, Decimal sizeBid, Decimal sizeAsk) {

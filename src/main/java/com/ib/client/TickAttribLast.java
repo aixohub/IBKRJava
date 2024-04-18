@@ -25,9 +25,8 @@ public class TickAttribLast {
   }
 
   public String toString() {
-    StringBuilder sb = new StringBuilder();
-    sb.append(m_pastLimit ? "pastLimit " : "");
-    sb.append(m_unreported ? "unreported " : "");
-    return sb.toString();
+    String sb = (m_pastLimit ? "pastLimit " : "")
+        + (m_unreported ? "unreported " : "");
+    return sb;
   }
 }

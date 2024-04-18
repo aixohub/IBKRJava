@@ -4,57 +4,58 @@
 package com.ib.client;
 
 public class Bar {
-    
-    private String m_time;
-    private double m_open;
-    private double m_high;
-    private double m_low;
-    private double m_close;
-    private Decimal m_volume;
-    private int m_count;
-    private Decimal m_wap;
 
-    public Bar(String time, double open, double high, double low, double close, Decimal volume, int count, Decimal wap) {
-        this.m_time = time;
-        this.m_open = open;
-        this.m_high = high;
-        this.m_low = low;
-        this.m_close = close;
-        this.m_volume = volume;
-        this.m_count = count;
-        this.m_wap = wap;
-    }
+  private final String m_time;
+  private final double m_open;
+  private final double m_high;
+  private final double m_low;
+  private final double m_close;
+  private final Decimal m_volume;
+  private final int m_count;
+  private final Decimal m_wap;
 
-    public String time() {
-        return m_time;
-    }
+  public Bar(String time, double open, double high, double low, double close, Decimal volume,
+      int count, Decimal wap) {
+    this.m_time = time;
+    this.m_open = open;
+    this.m_high = high;
+    this.m_low = low;
+    this.m_close = close;
+    this.m_volume = volume;
+    this.m_count = count;
+    this.m_wap = wap;
+  }
 
-    public double open() {
-        return m_open;
-    }
+  public String time() {
+    return m_time;
+  }
 
-    public double high() {
-        return m_high;
-    }
+  public double open() {
+    return m_open;
+  }
 
-    public double low() {
-        return m_low;
-    }
+  public double high() {
+    return m_high;
+  }
 
-    public double close() {
-        return m_close;
-    }
+  public double low() {
+    return m_low;
+  }
 
-    public Decimal volume() {
-        return m_volume;
-    }
+  public double close() {
+    return m_close;
+  }
 
-    public int count() {
-        return m_count;
-    }
+  public Decimal volume() {
+    return m_volume;
+  }
 
-    public Decimal wap() {
-        return m_wap;
-    }
-    
+  public int count() {
+    return m_count;
+  }
+
+  public Decimal wap() {
+    return m_wap;
+  }
+
 }

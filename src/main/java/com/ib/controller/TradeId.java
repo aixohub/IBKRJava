@@ -5,8 +5,14 @@ package com.ib.controller;
 
 public class TradeId {
 
-  private String m_key;
-  private String m_full;
+  private final String m_key;
+  private final String m_full;
+
+  public TradeId(String id) {
+    m_full = id;
+    int i = id.lastIndexOf('.');
+    m_key = id.substring(i + 1);
+  }
 
   public String key() {
     return m_key;
@@ -14,11 +20,5 @@ public class TradeId {
 
   public String full() {
     return m_full;
-  }
-
-  public TradeId(String id) {
-    m_full = id;
-    int i = id.lastIndexOf('.');
-    m_key = id.substring(i + 1);
   }
 }

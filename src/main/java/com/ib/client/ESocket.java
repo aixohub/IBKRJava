@@ -11,15 +11,15 @@ public class ESocket implements ETransport {
 
   protected DataOutputStream m_dos;   // the socket output stream
 
+  ESocket(Socket s) throws IOException {
+    m_dos = new DataOutputStream(s.getOutputStream());
+  }
+
   @Override
   public void send(EMessage msg) throws IOException {
     byte[] buf = msg.getRawData();
 
     m_dos.write(buf, 0, buf.length);
-  }
-
-  ESocket(Socket s) throws IOException {
-    m_dos = new DataOutputStream(s.getOutputStream());
   }
 
   // Sends String without length prefix (pre-V100 style)

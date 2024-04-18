@@ -7,5 +7,6 @@ import com.ib.client.OrderCondition;
 import com.trader.apidemo.util.VerticalPanel;
 
 public abstract class OnOKPanel extends VerticalPanel {
-	public abstract OrderCondition onOK();
+
+  public abstract OrderCondition onOK();
 }

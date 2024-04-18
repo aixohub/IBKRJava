@@ -8,6 +8,11 @@ public class HistogramEntry implements Comparable<HistogramEntry> {
   private double price;
   private Decimal size;
 
+  public HistogramEntry(double price, Decimal size) {
+    this.price = price;
+    this.size = size;
+  }
+
   public double price() {
     return price;
   }
@@ -24,20 +29,14 @@ public class HistogramEntry implements Comparable<HistogramEntry> {
     this.size = size;
   }
 
-  public HistogramEntry(double price, Decimal size) {
-    this.price = price;
-    this.size = size;
-  }
-
   @Override
   public boolean equals(Object o) {
     if (this == o) {
       return true;
     }
-    if (o == null || !(o instanceof HistogramEntry)) {
+    if (o == null || !(o instanceof HistogramEntry he)) {
       return false;
     }
-    HistogramEntry he = (HistogramEntry) o;
     return Double.compare(price, he.price) == 0 && Decimal.compare(size, he.size) == 0;
   }
 

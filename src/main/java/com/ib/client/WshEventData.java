@@ -5,14 +5,40 @@ package com.ib.client;
 
 public class WshEventData {
 
-  private int m_conId;
-  private String m_filter;
-  private boolean m_fillWatchlist;
-  private boolean m_fillPortfolio;
-  private boolean m_fillCompetitors;
-  private String m_startDate;
-  private String m_endDate;
-  private int m_totalLimit;
+  private final int m_conId;
+  private final String m_filter;
+  private final boolean m_fillWatchlist;
+  private final boolean m_fillPortfolio;
+  private final boolean m_fillCompetitors;
+  private final String m_startDate;
+  private final String m_endDate;
+  private final int m_totalLimit;
+
+  public WshEventData(int conId, boolean fillWatchlist, boolean fillPortfolio,
+      boolean fillCompetitors,
+      String startDate, String endDate, int totalLimit) {
+    m_conId = conId;
+    m_filter = "";
+    m_fillWatchlist = fillWatchlist;
+    m_fillPortfolio = fillPortfolio;
+    m_fillCompetitors = fillCompetitors;
+    m_startDate = startDate;
+    m_endDate = endDate;
+    m_totalLimit = totalLimit;
+  }
+
+  public WshEventData(String filter, boolean fillWatchlist, boolean fillPortfolio,
+      boolean fillCompetitors,
+      String startDate, String endDate, int totalLimit) {
+    m_conId = Integer.MAX_VALUE;
+    m_filter = filter;
+    m_fillWatchlist = fillWatchlist;
+    m_fillPortfolio = fillPortfolio;
+    m_fillCompetitors = fillCompetitors;
+    m_startDate = startDate;
+    m_endDate = endDate;
+    m_totalLimit = totalLimit;
+  }
 
   public int conId() {
     return m_conId;
@@ -44,32 +70,6 @@ public class WshEventData {
 
   public int totalLimit() {
     return m_totalLimit;
-  }
-
-  public WshEventData(int conId, boolean fillWatchlist, boolean fillPortfolio,
-      boolean fillCompetitors,
-      String startDate, String endDate, int totalLimit) {
-    m_conId = conId;
-    m_filter = "";
-    m_fillWatchlist = fillWatchlist;
-    m_fillPortfolio = fillPortfolio;
-    m_fillCompetitors = fillCompetitors;
-    m_startDate = startDate;
-    m_endDate = endDate;
-    m_totalLimit = totalLimit;
-  }
-
-  public WshEventData(String filter, boolean fillWatchlist, boolean fillPortfolio,
-      boolean fillCompetitors,
-      String startDate, String endDate, int totalLimit) {
-    m_conId = Integer.MAX_VALUE;
-    m_filter = filter;
-    m_fillWatchlist = fillWatchlist;
-    m_fillPortfolio = fillPortfolio;
-    m_fillCompetitors = fillCompetitors;
-    m_startDate = startDate;
-    m_endDate = endDate;
-    m_totalLimit = totalLimit;
   }
 
 }

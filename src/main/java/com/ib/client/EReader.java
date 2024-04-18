@@ -18,14 +18,27 @@ import java.util.LinkedList;
  */
 public class EReader extends Thread {
 
-  private EClientSocket m_clientSocket;
-  private EReaderSignal m_signal;
-  private EDecoder m_processMsgsDecoder;
+  static final int MAX_MSG_LENGTH = 0xffffff;
   private static final EWrapper defaultWrapper = new DefaultEWrapper();
   private static final int IN_BUF_SIZE_DEFAULT = 8192;
+  private final Deque<EMessage> m_msgQueue = new LinkedList<>();
+  private final EClientSocket m_clientSocket;
+  private final EReaderSignal m_signal;
+  private final EDecoder m_processMsgsDecoder;
   private byte[] m_iBuf = new byte[IN_BUF_SIZE_DEFAULT];
   private int m_iBufLen = 0;
-  private final Deque<EMessage> m_msgQueue = new LinkedList<>();
+
+  /**
+   * Construct the EReader.
+   *
+   * @param parent An EClientSocket connected to TWS.
+   * @param signal A callback that informs that there are messages in msg queue.
+   */
+  public EReader(EClientSocket parent, EReaderSignal signal) {
+    m_clientSocket = parent;
+    m_signal = signal;
+    m_processMsgsDecoder = new EDecoder(parent.serverVersion(), parent.wrapper(), parent);
+  }
 
   protected boolean isUseV100Plus() {
     return m_clientSocket.isUseV100Plus();
@@ -40,18 +53,6 @@ public class EReader extends Thread {
   }
 
   /**
-   * Construct the EReader.
-   *
-   * @param parent An EClientSocket connected to TWS.
-   * @param signal A callback that informs that there are messages in msg queue.
-   */
-  public EReader(EClientSocket parent, EReaderSignal signal) {
-    m_clientSocket = parent;
-    m_signal = signal;
-    m_processMsgsDecoder = new EDecoder(parent.serverVersion(), parent.wrapper(), parent);
-  }
-
-  /**
    * Read and put messages to the msg queue until interrupted or TWS closes connection.
    */
   @Override
@@ -59,9 +60,9 @@ public class EReader extends Thread {
     try {
       // loop until thread is terminated
       while (!isInterrupted()) {
-				if (!putMessageToQueue()) {
-					break;
-				}
+        if (!putMessageToQueue()) {
+          break;
+        }
       }
     } catch (Exception ex) {
       //if (parent().isConnected()) {
@@ -82,9 +83,9 @@ public class EReader extends Thread {
   public boolean putMessageToQueue() throws IOException {
     EMessage msg = readSingleMessage();
 
-		if (msg == null) {
-			return false;
-		}
+    if (msg == null) {
+      return false;
+    }
 
     synchronized (m_msgQueue) {
       m_msgQueue.addFirst(msg);
@@ -98,17 +99,6 @@ public class EReader extends Thread {
   protected EMessage getMsg() {
     synchronized (m_msgQueue) {
       return m_msgQueue.isEmpty() ? null : m_msgQueue.removeLast();
-    }
-  }
-
-  static final int MAX_MSG_LENGTH = 0xffffff;
-
-  private static class InvalidMessageLengthException extends IOException {
-
-    private static final long serialVersionUID = 1L;
-
-    InvalidMessageLengthException(String message) {
-      super(message);
     }
   }
 
@@ -155,31 +145,31 @@ public class EReader extends Thread {
 
     int msgSize;
 
-		while (true) {
-			try {
-				msgSize = 0;
-				if (m_iBufLen > 0) {
-					try (EDecoder decoder = new EDecoder(m_clientSocket.serverVersion(), defaultWrapper)) {
-						msgSize = decoder.processMsg(new EMessage(m_iBuf, m_iBufLen));
-					}
-				}
-				break;
-			} catch (IOException e) {
-				if (m_iBufLen >= m_iBuf.length * 3 / 4) {
-					byte[] tmp = new byte[m_iBuf.length * 2];
+    while (true) {
+      try {
+        msgSize = 0;
+        if (m_iBufLen > 0) {
+          try (EDecoder decoder = new EDecoder(m_clientSocket.serverVersion(), defaultWrapper)) {
+            msgSize = decoder.processMsg(new EMessage(m_iBuf, m_iBufLen));
+          }
+        }
+        break;
+      } catch (IOException e) {
+        if (m_iBufLen >= m_iBuf.length * 3 / 4) {
+          byte[] tmp = new byte[m_iBuf.length * 2];
 
-					System.arraycopy(m_iBuf, 0, tmp, 0, m_iBuf.length);
+          System.arraycopy(m_iBuf, 0, tmp, 0, m_iBuf.length);
 
-					m_iBuf = tmp;
-				}
+          m_iBuf = tmp;
+        }
 
-				m_iBufLen += appendIBuf();
-			}
-		}
+        m_iBufLen += appendIBuf();
+      }
+    }
 
-		if (msgSize == 0) {
-			return null;
-		}
+    if (msgSize == 0) {
+      return null;
+    }
 
     EMessage msg = new EMessage(m_iBuf, msgSize);
 
@@ -201,5 +191,14 @@ public class EReader extends Thread {
 
   protected int appendIBuf() throws IOException {
     return m_clientSocket.read(m_iBuf, m_iBufLen, m_iBuf.length - m_iBufLen);
+  }
+
+  private static class InvalidMessageLengthException extends IOException {
+
+    private static final long serialVersionUID = 1L;
+
+    InvalidMessageLengthException(String message) {
+      super(message);
+    }
   }
 }

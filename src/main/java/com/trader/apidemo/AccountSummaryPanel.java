@@ -24,7 +24,7 @@ import javax.swing.table.AbstractTableModel;
 
 public class AccountSummaryPanel extends NewTabPanel {
 
-  private SummaryModel m_model = new SummaryModel();
+  private final SummaryModel m_model = new SummaryModel();
 
   AccountSummaryPanel() {
     HtmlButton sub = new HtmlButton("Subscribe") {

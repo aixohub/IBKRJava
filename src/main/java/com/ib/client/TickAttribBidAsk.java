@@ -25,9 +25,8 @@ public class TickAttribBidAsk {
   }
 
   public String toString() {
-    StringBuilder sb = new StringBuilder();
-    sb.append(m_bidPastLow ? "bidPastLow " : "");
-    sb.append(m_askPastHigh ? "askPastHigh " : "");
-    return sb.toString();
+    String sb = (m_bidPastLow ? "bidPastLow " : "")
+        + (m_askPastHigh ? "askPastHigh " : "");
+    return sb;
   }
 }

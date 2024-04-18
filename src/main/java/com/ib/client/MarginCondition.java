@@ -6,6 +6,7 @@ package com.ib.client;
 public class MarginCondition extends OperatorCondition {
 
   public static final OrderConditionType conditionType = OrderConditionType.Margin;
+  private int m_percent;
 
   protected MarginCondition() {
   }
@@ -14,8 +15,6 @@ public class MarginCondition extends OperatorCondition {
   public String toString() {
     return "the margin cushion percent" + super.toString();
   }
-
-  private int m_percent;
 
   public int percent() {
     return m_percent;
